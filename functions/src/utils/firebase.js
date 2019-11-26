@@ -4,20 +4,20 @@ const firebase = require('firebase');
 const config = require('../config/index');
 const serviceAccount = require('./firebaseAdmin');
 const firebaseConfig = {
-	apiKey: config.firebaseConfig.apiKey,
-	authDomain: config.firebaseConfig.authDomain,
-	databaseURL: config.firebaseConfig.databaseURL,
-	projectId: config.firebaseConfig.projectId,
-	storageBucket: config.firebaseConfig.storageBucket,
-	messagingSenderId: config.firebaseConfig.messagingSenderId,
-	appId: config.firebaseConfig.appId,
-	measurementId: config.firebaseConfig.measurementId,
+    apiKey: config.firebaseConfig.apiKey,
+    appId: config.firebaseConfig.appId,
+    authDomain: config.firebaseConfig.authDomain,
+    databaseURL: config.firebaseConfig.databaseURL,
+    measurementId: config.firebaseConfig.measurementId,
+    messagingSenderId: config.firebaseConfig.messagingSenderId,
+    projectId: config.firebaseConfig.projectId,
+    storageBucket: config.firebaseConfig.storageBucket,
 };
 
 admin.initializeApp({
-	credential: admin.credential.cert(serviceAccount),
-	databaseURL: config.firebaseConfig.databaseURL,
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: config.firebaseConfig.databaseURL,
 });
 firebase.initializeApp(firebaseConfig);
 
-module.exports = { admin, functions, firebase };
+module.exports = { admin, firebase, functions };
