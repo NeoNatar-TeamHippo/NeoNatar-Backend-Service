@@ -4,7 +4,8 @@ class ErrorHandler {
 	}
 
 	static tryCatchError(res, error) {
-		return res.status(500).json({
+		console.error(error);
+		return res.status(error.code).json({
 			status: 'error',
 			message: error.message,
 		});
