@@ -13,7 +13,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 app.use(morgan('dev'));
 //Use Routes Here
-app.use('/v2/auth', users);
+app.use('/v1/auth', users);
 //Error Handlers
 app.use((req, res, next) => {
 	const err = new Error('Not Found');
