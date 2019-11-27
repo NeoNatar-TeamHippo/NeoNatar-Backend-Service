@@ -1,3 +1,5 @@
+/* eslint-disable promise/always-return */
+/* eslint-disable max-lines-per-function */
 const {
     CREATED, getStatusText, INTERNAL_SERVER_ERROR, NOT_FOUND, OK,
 } = require('http-status-codes');
@@ -29,9 +31,7 @@ const Locations = {
                 status,
                 trafficRate,
             };
-            const location = await db.collection('locations').doc().create(data).then(ref => {
-                return ref;
-            });
+            const location = await db.collection('locations').doc().create(data).then(ref => ref);
             return res.status(CREATED).send({
                 data: { location, message: 'Location successfully created' },
                 status: 'success',
@@ -69,14 +69,14 @@ const Locations = {
 
     async getAll(req, res) {
         try {
-            const query = await db.collection('locations')
+            const query = await db.collection('locations');
             const locations = [];
             await query.get().then(querySnapshot => {
-                let docs = querySnapshot.docs;
-                for (let doc of docs) {
+                const docs = querySnapshot.docs;
+                for (const doc of docs) {
                     const selectedItem = {
                         id: doc.id,
-                        location: doc.data()
+                        location: doc.data(),
                     };
                     locations.push(selectedItem);
                 }});

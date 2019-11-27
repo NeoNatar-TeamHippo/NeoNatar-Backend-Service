@@ -15,5 +15,6 @@ admin.initializeApp({
     databaseURL: databaseURL,
 });
 firebase.initializeApp(config);
+const db = admin.firestore();
 
-module.exports = { admin, firebase, functions };
+module.exports = { admin, db, firebase, functions };
