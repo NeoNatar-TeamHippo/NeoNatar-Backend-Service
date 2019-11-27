@@ -65,5 +65,4 @@ node_modules/
 .env
 
 #package lock.json
-package-lock.json*
-middlewares
+package-lock.json
