@@ -18,13 +18,9 @@ const Locations = {
                 address, coords, country, image, lga, name, price, state, status, trafficRate,
             } = req.body;
             const data = {
-                address, coords, country, createdAt: new Date().toISOString(), image, lga,
-                name,
-                price,
-                state,
-                status,
-                trafficRate,
+                address, coords, country, image, lga, name, price, state, status, trafficRate,
             };
+            data.createdAt = new Date().toISOString();
             const location = await db.collection('locations').doc().create(data).then(ref => ref);
             return res.status(CREATED).send({
                 data: { location, message: 'Location successfully created' },
