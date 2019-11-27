@@ -17,12 +17,7 @@ const Locations = {
                 address, coords, country, image, lga, name, price, state, status, trafficRate,
             } = req.body;
             const data = {
-                address,
-                coords,
-                country,
-                createdAt: new Date().toISOString(),
-                image,
-                lga,
+                address, coords, country, createdAt: new Date().toISOString(), image, lga,
                 name,
                 price,
                 state,
@@ -67,9 +62,8 @@ const Locations = {
 
     async getAll(req, res) {
         try {
-            const query = await db.collection('locations');
             const locations = [];
-            await query.get().then(querySnapshot => {
+            await db.collection('locations').get().then(querySnapshot => {
                 const docs = querySnapshot.docs;
                 for (const doc of docs) {
                     const selectedItem = {
@@ -77,8 +71,7 @@ const Locations = {
                         location: doc.data(),
                     };
                     locations.push(selectedItem);
-                }
-                return locations;
+                } return locations;
             });
             return res.status(OK).send({
                 data: { locations },
