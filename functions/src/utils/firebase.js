@@ -1,5 +1,12 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-admin.initializeApp();
+const config = require('../config/index');
 
-module.exports = { admin, functions };
+const serviceAccount = require('./firebaseAdmin');
+admin.initializeApp({
+	credential: admin.credential.cert(serviceAccount),
+	databaseURL: config.firebaseConfig.databaseURL,
+});
+const db = admin.firestore();
+
+module.exports = { db, functions };

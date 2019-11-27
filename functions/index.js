@@ -5,6 +5,7 @@ const morgan = require('morgan');
 
 const { admin, functions } = require('./src/utils/firebase');
 const users = require('./src/routes/users');
+const routes = require('./src/routes/index');
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(cors());
 app.use(morgan('dev'));
 //Use Routes Here
 app.use('/v2/auth', users);
+app.use('/v1', routes);
 //Error Handlers
 app.use((req, res, next) => {
 	const err = new Error('Not Found');
