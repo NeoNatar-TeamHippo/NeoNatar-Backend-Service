@@ -7,6 +7,7 @@ const router = express.Router();
 
 router.post('/signup', userController.signupUser);
 router.post('/signin', userController.signinUser);
-router.post('/uploadAvatar', FBauth, filesUpload, userController.uploadAvatar);
+router.patch('/uploadAvatar', FBauth, filesUpload, userController.uploadAvatar);
+router.get('/', FBauth, userController.viewProfile);
 
 module.exports = router;

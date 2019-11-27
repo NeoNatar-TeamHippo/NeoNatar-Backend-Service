@@ -12,7 +12,7 @@ const FBauth = async (req, res, next) => {
         req.user = decodedToken;
         const data = await admin.firestore().collection('users').where('userId', '==', req.user.uid)
             .limit(1).get();
-        const { userId, role, isAdmin, status, avatar } = data.docs[0].data();
+        const { userId, role, isAdmin, status } = data.docs[0].data();
         req.user.userId = userId;
         req.user.role = role;
         req.user.isAdmin = isAdmin;

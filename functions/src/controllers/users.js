@@ -84,5 +84,26 @@ class userController {
             errorHandler.tryCatchError(res, error);
         }
     }
+    /**
+	 * User profile details
+	 * @function
+	 * @param {object} req - request object
+	 * @param {object} res - response object
+	 * @return  {Object} user details
+	 */
+    static async viewProfile(req, res) {
+        try {
+            const { userId } = req.user;
+            const data = await admin.firestore().collection('users')
+                .where('userId', '==', userId).get();
+            const userDetails = data.docs[0].data();
+            return res.status(200).json({
+                data: userDetails, status: 'success',
+            });
+        } catch (error) {
+            errorHandler.tryCatchError(res, error);
+        }
+    }
+
 }
 module.exports = userController;
