@@ -12,8 +12,8 @@ const config = {
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    databaseURL: config.firebaseConfig.databaseURL,
-    storageBucket: config.firebaseConfig.storageBucket,
+    databaseURL: databaseURL,
+    storageBucket: storageBucket,
 });
 firebase.initializeApp(config);
 
