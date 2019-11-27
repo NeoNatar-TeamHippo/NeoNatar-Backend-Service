@@ -9,5 +9,6 @@ router.post('/signup', userController.signupUser);
 router.post('/signin', userController.signinUser);
 router.patch('/uploadAvatar', FBauth, filesUpload, userController.uploadAvatar);
 router.get('/', FBauth, userController.viewProfile);
+router.put('/', FBauth, userController.updateProfile);
 
 module.exports = router;

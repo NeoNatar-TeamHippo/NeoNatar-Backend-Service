@@ -27,4 +27,11 @@ const validateSignUpData = data => {
     }
     return { errors, valid: Object.keys(errors).length === 0 ? true : false };
 };
-module.exports = { isEmail, validateSignInData, validateSignUpData };
+const validateUpdateProfile = data => {
+    const errors = {};
+    if (_.isEmpty(data.address) || _.isEmpty(data.firstName) || _.isEmpty(data.lastName)) {
+        errors.fields = 'Fields must not be empty';
+    }
+    return { errors, valid: Object.keys(errors).length === 0 ? true : false };
+};
+module.exports = { isEmail, validateSignInData, validateSignUpData, validateUpdateProfile };
