@@ -1,5 +1,3 @@
-/* eslint-disable promise/always-return */
-/* eslint-disable max-lines-per-function */
 const {
     CREATED, getStatusText, INTERNAL_SERVER_ERROR, NOT_FOUND, OK,
 } = require('http-status-codes');
@@ -79,7 +77,9 @@ const Locations = {
                         location: doc.data(),
                     };
                     locations.push(selectedItem);
-                }});
+                }
+                return locations;
+            });
             return res.status(OK).send({
                 data: { locations },
                 status: 'success',
