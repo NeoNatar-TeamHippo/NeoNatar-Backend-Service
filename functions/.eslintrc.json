@@ -82,7 +82,7 @@
 		"max-len": ["error", {
 			"code": 100
 		}],
-		"max-lines-per-function": ["error", 30],
+		"max-lines-per-function": ["error", 25],
 		"sort-keys": ["error", "asc"],
 		// Removed rule "disallow the use of console" from recommended eslint rules
 		"no-console": "off",
