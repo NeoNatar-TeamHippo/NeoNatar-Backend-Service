@@ -1,12 +1,19 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-const config = require('../config/index');
-
+const firebase = require('firebase');
+const { firebaseConfig } = require('../config/index');
+const { apiKey, appId, authDomain, databaseURL, measurementId,
+    messagingSenderId, projectId, storageBucket } = firebaseConfig;
 const serviceAccount = require('./firebaseAdmin');
-admin.initializeApp({
-	credential: admin.credential.cert(serviceAccount),
-	databaseURL: config.firebaseConfig.databaseURL,
-});
-const db = admin.firestore();
+const config = {
+    apiKey, appId, authDomain, databaseURL, measurementId,
+    messagingSenderId, projectId, storageBucket,
+};
 
-module.exports = { db, functions };
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: databaseURL,
+});
+firebase.initializeApp(config);
+
+module.exports = { admin, firebase, functions };
