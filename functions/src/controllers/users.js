@@ -1,8 +1,10 @@
 const { firebase, admin } = require('../utils/firebase');
 const errorHandler = require('../utils/errorHandler');
 const { validateSignInData, validateSignUpData } = require('../validations/user');
+const { firebaseConfig } = require('../config/index');
 const _ = require('lodash');
 const db = admin.firestore();
+
 class userController {
     /**
 	 * A user sign up route, creates a new dataset in the firestore.
@@ -17,10 +19,13 @@ class userController {
             const dataToValidate = { confirmPassword, email, firstName, lastName, password };
             const { valid, errors } = validateSignUpData(dataToValidate);
             if (!valid) errorHandler.validationError(res, errors);
+            const defaultAvatar = 'Headshot-Placeholder-1.png';
             const data = await firebase.auth().createUserWithEmailAndPassword(email, password);
             const token = await data.user.getIdToken();
             const userCredentials = {
-                avatar: '', createdAt: new Date().toISOString(), email,
+                avatar: `https://firebaseestorage.googleapis.com/v0/b/
+                ${firebaseConfig.storageBucket}/o/${defaultAvatar}?alt=media`,
+                createdAt: new Date().toISOString(), email,
                 firstName, isAdmin: false, lastName, role: '', status: 'active',
                 userId: data.user.uid,
             };
@@ -59,5 +64,6 @@ class userController {
             errorHandler.tryCatchError(res, error);
         }
     }
+
 }
 module.exports = userController;

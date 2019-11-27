@@ -3,7 +3,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 
-const { admin, functions } = require('./src/utils/firebase');
+const { functions } = require('./src/utils/firebase');
 const users = require('./src/routes/users');
 
 const app = express();
@@ -16,16 +16,16 @@ app.use(morgan('dev'));
 app.use('/v1/auth', users);
 //Error Handlers
 app.use((req, res, next) => {
-	const err = new Error('Not Found');
-	err.status = 404;
-	next(err);
+    const err = new Error('Not Found');
+    err.status = 404;
+    next(err);
 });
 app.use((err, req, res, next) => {
-	res.status(err.status || 500).json({
-		errors: {
-			message: err.message,
-		},
-	});
+    res.status(err.status || 500).json({
+        errors: {
+            message: err.message,
+        },
+    });
 });
 
 exports.api = functions.https.onRequest(app);
