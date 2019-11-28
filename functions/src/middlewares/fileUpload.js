@@ -20,6 +20,7 @@ exports.filesUpload = function (req, res, next) {
     });
     const fields = {}, files = [], fileWrites = [];
     busboy.on('field', (key, value) => { fields[key] = value; });
+    // eslint-disable-next-line max-lines-per-function
     busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
         const imageExtension = filename.split('.')[filename.split('.').length - 1];
         const imageFileName = `${Math.round(Math.random() * 10000000000)}.${imageExtension}`;
