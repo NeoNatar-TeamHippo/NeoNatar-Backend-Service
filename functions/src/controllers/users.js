@@ -116,5 +116,22 @@ class userController {
             return tryCatchError(res, error);
         }
     }
+    /**
+  * Logs a user out
+  * @function
+  * @param {object} req - request object
+  * @param {object} res - response object
+  * @return  {Object} result
+  */
+    static async logoutUser(req, res) {
+        try {
+            const { userId } = req.user;
+            await firebase.auth().signOut();
+            // await db.doc(`/users/${userId}`).update({ address, firstName, lastName });
+            return successNoData(res, 200, 'Logout successfully');
+        } catch (error) {
+            return tryCatchError(res, error);
+        }
+    }
 }
 module.exports = userController;
