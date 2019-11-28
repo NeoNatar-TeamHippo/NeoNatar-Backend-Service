@@ -1,8 +1,11 @@
 const {
     CREATED, getStatusText, INTERNAL_SERVER_ERROR, NOT_FOUND, OK,
 } = require('http-status-codes');
+
 const { db } = require('../utils/firebase');
+const validateLocationInput = require('../validations/locationInput');
 const errorHandler = require('../utils/errorHandler');
+const successHandler = require('../utils/successHandler');
 
 const Locations = {
     /**
@@ -20,14 +23,16 @@ const Locations = {
             const data = {
                 address, coords, country, image, lga, name, price, state, status, trafficRate,
             };
+            const { valid, errors } = await validateLocationInput(data);
+            if (!valid) errorHandler.validationError(res, errors);
             data.createdAt = new Date().toISOString();
-            const location = await db.collection('locations').doc().create(data).then(ref => ref);
-            return res.status(CREATED).send({
-                data: { location, message: 'Location successfully created' },
-                status: 'success',
-            });
+            if (valid) {
+                const location = await db.collection('locations').doc().create(data).then(
+                    ref => ref);
+                return successHandler.successNOData(res, 201, 'Location successfully created');
+            }
         } catch (error) {
-            errorHandler.tryCatchError(res, error);
+            return errorHandler.tryCatchError(res, error);
         }
     },
 
@@ -36,15 +41,9 @@ const Locations = {
             const location = await db.collection('locations').doc(req.params.id);
             await location.delete();
             if (!location) {
-                return res.status(NOT_FOUND).send({
-                    message: getStatusText(NOT_FOUND),
-                    status: 'error',
-                });
+                return errorHandler.validationError(res, 'Location not found');
             }
-            return res.status(OK).send({
-                data: null,
-                status: 'success',
-            });
+            return successHandler.successNoData(res, 200, 'Location deleted successfully');
         } catch (error) {
             errorHandler.tryCatchError(res, error);
         }
@@ -63,10 +62,7 @@ const Locations = {
                     locations.push(selectedItem);
                 } return locations;
             });
-            return res.status(OK).send({
-                data: { locations },
-                status: 'success',
-            });
+            return successHandler.successNoMessage(res, 200, locations);
         } catch (error) {
             errorHandler.tryCatchError(res, error);
         }
@@ -76,17 +72,11 @@ const Locations = {
         try {
             const document = db.collection('locations').doc(req.params.id);
             if (!document) {
-                return res.status(NOT_FOUND).send({
-                    message: getStatusText(NOT_FOUND),
-                    status: 'error',
-                });
+                return errorHandler.validationError(res, 'Document not found');
             }
             const documentData = await document.get();
             const location = documentData.data();
-            return res.status(OK).send({
-                data: { location },
-                status: 'success',
-            });
+            return successHandler.successNoMessage(res, 200, location);
         } catch (error) {
             errorHandler.tryCatchError(res, error);
         }
@@ -99,10 +89,7 @@ const Locations = {
             if (!document) errorHandler.validationError(res, errors);
             const location = await document.update(req.body);
 
-            return res.status(CREATED).send({
-                data: { location, message: 'Comment successfully updated' },
-                status: 'success',
-            });
+            return successHandler.successNOData(res, 201, 'Location successfully updated');
         } catch (error) {
             errorHandler.tryCatchError(res, error);
         }
