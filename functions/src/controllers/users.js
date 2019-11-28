@@ -1,3 +1,4 @@
+const { CREATED, OK } = require('http-status-codes');
 const { firebase, admin } = require('../utils/firebase');
 const { validationError, tryCatchError } = require('../utils/errorHandler');
 const { successNoData, successWithData, successNoMessage } = require('../utils/successHandler');
@@ -25,7 +26,7 @@ class userController {
             const avatar = getFirebaseLink('Headshot-Placeholder-1.png');
             const userData = createUserData(avatar, email, firstName, lastName, userId);
             await db.doc(`users/${data.user.uid}`).set(userData);
-            return successWithData(res, 201, `Sign up successful`, token);
+            return successWithData(res, CREATED, `Sign up successful`, token);
         } catch (error) {
             return tryCatchError(res, error);
         }
@@ -45,7 +46,7 @@ class userController {
             const data = await firebase.auth().signInWithEmailAndPassword(email, password);
             if (data) {
                 const token = await data.user.getIdToken();
-                return successNoMessage(res, 201, token);
+                return successNoMessage(res, CREATED, token);
             }
         } catch (error) {
             if (error.code === 'auth/user-not-found') {
@@ -74,7 +75,7 @@ class userController {
             });
             const avatar = getFirebaseLink(imageToBeUploaded.originalname);
             await db.doc(`/users/${userId}`).update({ avatar });
-            return successNoData(res, 200, 'Avatar uploaded success');
+            return successNoData(res, OK, 'Avatar uploaded success');
         } catch (error) {
             return tryCatchError(res, error);
         }
@@ -92,7 +93,7 @@ class userController {
             const data = await db.collection('users')
                 .where('userId', '==', userId).get();
             const userDetails = data.docs[0].data();
-            return successNoMessage(res, 200, userDetails);
+            return successNoMessage(res, OK, userDetails);
         } catch (error) {
             return tryCatchError(res, error);
         }
@@ -111,7 +112,7 @@ class userController {
             const { valid, errors } = validateUpdateProfile({ address, firstName, lastName });
             if (!valid) return validationError(res, errors);
             await db.doc(`/users/${userId}`).update({ address, firstName, lastName });
-            return successNoData(res, 200, 'Updated successfully');
+            return successNoData(res, OK, 'Updated successfully');
         } catch (error) {
             return tryCatchError(res, error);
         }
@@ -127,7 +128,6 @@ class userController {
         try {
             const { userId } = req.user;
             await firebase.auth().signOut();
-            // await db.doc(`/users/${userId}`).update({ address, firstName, lastName });
             return successNoData(res, 200, 'Logout successfully');
         } catch (error) {
             return tryCatchError(res, error);

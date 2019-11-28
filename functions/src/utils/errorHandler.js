@@ -1,3 +1,6 @@
+const {
+    CREATED, getStatusText, INTERNAL_SERVER_ERROR, NOT_FOUND, OK,
+} = require('http-status-codes');
 class ErrorHandler {
     static validationError(res, message) {
         return res.status(400).json({ message, status: 'error' });
