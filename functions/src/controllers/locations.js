@@ -50,6 +50,7 @@ const Locations = {
         }
     },
 
+    // eslint-disable-next-line max-lines-per-function
     async getAll(req, res) {
         try {
             const locations = [];
