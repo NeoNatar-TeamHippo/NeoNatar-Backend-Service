@@ -6,6 +6,7 @@ const morgan = require('morgan');
 const routes = require('./src/routes');
 const { functions } = require('./src/utils/firebase');
 const users = require('./src/routes/users');
+const routes = require('./src/routes/index');
 
 const app = express();
 
