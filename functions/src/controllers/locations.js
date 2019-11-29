@@ -1,5 +1,5 @@
 const {
-    CREATED, getStatusText, INTERNAL_SERVER_ERROR, NOT_FOUND, OK,
+    CREATED, OK,
 } = require('http-status-codes');
 
 const { db } = require('../utils/firebase');
@@ -27,9 +27,9 @@ const Locations = {
             if (!valid) errorHandler.validationError(res, errors);
             data.createdAt = new Date().toISOString();
             if (valid) {
-                const location = await db.collection('locations').doc().create(data).then(
+                await db.collection('locations').doc().create(data).then(
                     ref => ref);
-                return successHandler.successNOData(res, 201, 'Location successfully created');
+                return successHandler.successNOData(res, CREATED, 'Location successfully created');
             }
         } catch (error) {
             return errorHandler.tryCatchError(res, error);
@@ -43,7 +43,7 @@ const Locations = {
             if (!location) {
                 return errorHandler.validationError(res, 'Location not found');
             }
-            return successHandler.successNoData(res, 200, 'Location deleted successfully');
+            return successHandler.successNoData(res, OK, 'Location deleted successfully');
         } catch (error) {
             errorHandler.tryCatchError(res, error);
         }
@@ -62,7 +62,7 @@ const Locations = {
                     locations.push(selectedItem);
                 } return locations;
             });
-            return successHandler.successNoMessage(res, 200, locations);
+            return successHandler.successNoMessage(res, OK, locations);
         } catch (error) {
             errorHandler.tryCatchError(res, error);
         }
@@ -76,7 +76,7 @@ const Locations = {
             }
             const documentData = await document.get();
             const location = documentData.data();
-            return successHandler.successNoMessage(res, 200, location);
+            return successHandler.successNoMessage(res, OK, location);
         } catch (error) {
             errorHandler.tryCatchError(res, error);
         }
@@ -87,9 +87,10 @@ const Locations = {
             const document = db.collection('locations').doc(req.params.id);
 
             if (!document) errorHandler.validationError(res, errors);
-            const location = await document.update(req.body);
+            req.body.updatedAt = new Date().toISOString();
+            await document.update(req.body);
 
-            return successHandler.successNOData(res, 201, 'Location successfully updated');
+            return successHandler.successNOData(res, CREATED, 'Location successfully updated');
         } catch (error) {
             errorHandler.tryCatchError(res, error);
         }
