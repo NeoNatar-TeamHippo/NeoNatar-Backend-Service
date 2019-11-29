@@ -5,7 +5,6 @@ const morgan = require('morgan');
 
 const routes = require('./src/routes');
 const { functions } = require('./src/utils/firebase');
-const users = require('./src/routes/users');
 
 const app = express();
 
@@ -14,7 +13,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 app.use(morgan('dev'));
 //Use Routes Here
-app.use('/v1/auth', users);
 routes.init(app);
 //Error Handlers
 app.use((req, res, next) => {
