@@ -2,10 +2,10 @@ const _ = require('lodash');
 
 const validateLocationInput = datas => {
     const errors = {};
+    if(Object.keys(datas).length !== 10) {
+        errors.fields = `data must not be complete`;
+    }
     for(const data in datas) {
-        if(datas.length !== 10) {
-            errors.fields = `data must not be complete`;
-        }
         if (_.isEmpty(data)) {
             errors.fields = `${data} must not be empty`;
         }

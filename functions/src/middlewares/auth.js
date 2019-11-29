@@ -1,5 +1,6 @@
-const { FORBIDDEN, BAD_REQUEST } = require('http-status-codes');
+const { FORBIDDEN, BAD_REQUEST, UNAUTHORIZED } = require('http-status-codes');
 const { admin } = require('../utils/firebase');
+
 const FBauth = async (req, res, next) => {
     try {
         let idToken;
@@ -20,6 +21,54 @@ const FBauth = async (req, res, next) => {
         return res.status(FORBIDDEN).json({ message: error.message, status: 'error' });
     }
 };
+
+const getAuthToken = (req, res, next) => {
+    if (
+        req.headers.authorization &&
+      req.headers.authorization.split(' ')[0] === 'Bearer'
+    ) {
+        req.authToken = req.headers.authorization.split(' ')[1];
+    } else {
+        req.authToken = null;
+    }
+    next();
+};
+  
+const checkIfAuthenticated = (req, res, next) => {
+    getAuthToken(req, res, async () => {
+        try {
+            const { authToken } = req;
+            const userInfo = await admin
+                .auth()
+                .verifyIdToken(authToken);
+            req.authId = userInfo.uid;
+            return next();
+        } catch (e) {
+            return res
+                .status(UNAUTHORIZED)
+                .send({ error: 'You are not authorized to make this request' });
+        }
+    });
+};
+const checkIfAdmin = (req, res, next) => {
+    getAuthToken(req, res, async () => {
+        try {
+            const { authToken } = req;
+            const userInfo = await admin
+                .auth()
+                .verifyIdToken(authToken);
+            if (userInfo.admin === true) {
+                req.authId = userInfo.uid;
+                return next();
+            }
+            throw new Error('unauthorized');
+        } catch (e) {
+            return res
+                .status(UNAUTHORIZED)
+                .send({ error: 'You are not authorized to make this request' });
+        }
+    });
+};
 const isSuperAdmin = async (req, res, next) => {
     try {
         const { userId, role, isAdmin, status } = req.user;
@@ -32,5 +81,5 @@ const isSuperAdmin = async (req, res, next) => {
     }
 };
 module.exports = {
-    FBauth, isSuperAdmin,
+    FBauth, checkIfAdmin, checkIfAuthenticated, isSuperAdmin,
 };
