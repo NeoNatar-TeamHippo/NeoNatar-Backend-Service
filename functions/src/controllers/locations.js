@@ -4,8 +4,8 @@ const {
 
 const { db } = require('../utils/firebase');
 const validateLocationInput = require('../validations/locationInput');
-const errorHandler = require('../utils/errorHandler');
-const successHandler = require('../utils/successHandler');
+const { tryCatchError, validationError } = require('../utils/errorHandler');
+const { successNOData, successNoMessage } = require('../utils/successHandler');
 
 const Locations = {
     /**
@@ -24,15 +24,15 @@ const Locations = {
                 address, coords, country, image, lga, name, price, state, status, trafficRate,
             };
             const { valid, errors } = await validateLocationInput(data);
-            if (!valid) errorHandler.validationError(res, errors);
+            if (!valid) validationError(res, errors);
             data.createdAt = new Date().toISOString();
             if (valid) {
                 await db.collection('locations').doc().create(data).then(
                     ref => ref);
-                return successHandler.successNOData(res, CREATED, 'Location successfully created');
+                return successNOData(res, CREATED, 'Location successfully created');
             }
         } catch (error) {
-            return errorHandler.tryCatchError(res, error);
+            return tryCatchError(res, error);
         }
     },
 
@@ -41,11 +41,11 @@ const Locations = {
             const location = await db.collection('locations').doc(req.params.id);
             await location.delete();
             if (!location) {
-                return errorHandler.validationError(res, 'Location not found');
+                return validationError(res, 'Location not found');
             }
-            return successHandler.successNoData(res, OK, 'Location deleted successfully');
+            return successNoData(res, OK, 'Location deleted successfully');
         } catch (error) {
-            errorHandler.tryCatchError(res, error);
+            tryCatchError(res, error);
         }
     },
 
@@ -62,9 +62,9 @@ const Locations = {
                     locations.push(selectedItem);
                 } return locations;
             });
-            return successHandler.successNoMessage(res, OK, locations);
+            return successNoMessage(res, OK, locations);
         } catch (error) {
-            errorHandler.tryCatchError(res, error);
+            tryCatchError(res, error);
         }
     },
 
@@ -72,13 +72,13 @@ const Locations = {
         try {
             const document = db.collection('locations').doc(req.params.id);
             if (!document) {
-                return errorHandler.validationError(res, 'Document not found');
+                return validationError(res, 'Document not found');
             }
             const documentData = await document.get();
             const location = documentData.data();
-            return successHandler.successNoMessage(res, OK, location);
+            return successNoMessage(res, OK, location);
         } catch (error) {
-            errorHandler.tryCatchError(res, error);
+            tryCatchError(res, error);
         }
     },
 
@@ -86,13 +86,13 @@ const Locations = {
         try {
             const document = db.collection('locations').doc(req.params.id);
 
-            if (!document) errorHandler.validationError(res, errors);
+            if (!document) validationError(res, errors);
             req.body.updatedAt = new Date().toISOString();
             await document.update(req.body);
 
-            return successHandler.successNOData(res, CREATED, 'Location successfully updated');
+            return successNOData(res, CREATED, 'Location successfully updated');
         } catch (error) {
-            errorHandler.tryCatchError(res, error);
+            tryCatchError(res, error);
         }
     },
 };
