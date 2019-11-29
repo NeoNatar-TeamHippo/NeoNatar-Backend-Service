@@ -1,9 +1,10 @@
-const {
-    CREATED, getStatusText, INTERNAL_SERVER_ERROR, NOT_FOUND, OK,
-} = require('http-status-codes');
+const { INTERNAL_SERVER_ERROR, NOT_FOUND, BAD_REQUEST } = require('http-status-codes');
 class ErrorHandler {
     static validationError(res, message) {
-        return res.status(400).json({ message, status: 'error' });
+        return res.status(BAD_REQUEST).json({ message, status: 'error' });
+    }
+    static normalError(res, statusCode, message) {
+        return res.status(statusCode).json({ message, status: 'error' });
     }
     static tryCatchError(res, error) {
         console.error(error);

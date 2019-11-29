@@ -1,11 +1,10 @@
 const { CREATED, OK } = require('http-status-codes');
-const { firebase, admin } = require('../utils/firebase');
+const { firebase, admin, db } = require('../utils/firebase');
 const { validationError, tryCatchError } = require('../utils/errorHandler');
 const { successNoData, successWithData, successNoMessage } = require('../utils/successHandler');
 const { validateSignInData, validateSignUpData,
     validateUpdateProfile } = require('../validations/user');
-const { getFirebaseLink, createUserData } = require('../utils/functions');
-const db = admin.firestore();
+const { getFirebaseLink, createUserData, superAdmin } = require('../utils/functions');
 class userController {
     /**
 	 * A user sign up route, creates a new dataset in the firestore.
@@ -17,14 +16,12 @@ class userController {
     static async signupUser(req, res) {
         try {
             const { email, password, firstName, lastName, confirmPassword } = req.body;
-            const dataToValidate = { confirmPassword, email, firstName, lastName, password };
-            const { valid, errors } = validateSignUpData(dataToValidate);
+            const { valid, errors } = validateSignUpData(req.body);
             if (!valid) return validationError(res, errors);
             const data = await firebase.auth().createUserWithEmailAndPassword(email, password);
-            const token = await data.user.getIdToken();
-            const userId = data.user.uid;
+            const token = await data.user.getIdToken(), userId = data.user.uid;
             const avatar = getFirebaseLink('Headshot-Placeholder-1.png');
-            const userData = createUserData(avatar, email, firstName, lastName, userId);
+            const userData = createUserData(avatar, email, firstName, lastName, userId, false);
             await db.doc(`users/${data.user.uid}`).set(userData);
             return successWithData(res, CREATED, `Sign up successful`, token);
         } catch (error) {
