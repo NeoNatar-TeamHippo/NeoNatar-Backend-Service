@@ -2,6 +2,7 @@ const {
     CREATED, getStatusText, INTERNAL_SERVER_ERROR, NOT_FOUND, OK,
 } = require('http-status-codes');
 const { db } = require('../utils/firebase');
+const errorHandler = require('../utils/errorHandler');
 
 const Locations = {
     /**
@@ -17,30 +18,16 @@ const Locations = {
                 address, coords, country, image, lga, name, price, state, status, trafficRate,
             } = req.body;
             const data = {
-                address,
-                coords,
-                country,
-                createdAt: new Date().toISOString(),
-                image,
-                lga,
-                name,
-                price,
-                state,
-                status,
-                trafficRate,
+                address, coords, country, image, lga, name, price, state, status, trafficRate,
             };
-            const location = await db.collection('locations').doc().create(data).then(ref => {
-                return ref;
-            });
+            data.createdAt = new Date().toISOString();
+            const location = await db.collection('locations').doc().create(data).then(ref => ref);
             return res.status(CREATED).send({
                 data: { location, message: 'Location successfully created' },
                 status: 'success',
             });
         } catch (error) {
-            return res.status(INTERNAL_SERVER_ERROR).send({                
-                message: getStatusText(INTERNAL_SERVER_ERROR),
-                status: 'error',
-            });
+            errorHandler.tryCatchError(res, error);
         }
     },
 
@@ -59,38 +46,29 @@ const Locations = {
                 status: 'success',
             });
         } catch (error) {
-            return res.status(INTERNAL_SERVER_ERROR).send({
-                error,
-                message: getStatusText(INTERNAL_SERVER_ERROR),
-                status: 'error',
-            });
+            errorHandler.tryCatchError(res, error);
         }
     },
 
     async getAll(req, res) {
         try {
-            const query = await db.collection('locations')
             const locations = [];
-            await query.get().then(querySnapshot => {
-                let docs = querySnapshot.docs;
-                // eslint-disable-next-line promise/always-return
-                for (let doc of docs) {
+            await db.collection('locations').get().then(querySnapshot => {
+                const docs = querySnapshot.docs;
+                for (const doc of docs) {
                     const selectedItem = {
                         id: doc.id,
-                        location: doc.data()
+                        location: doc.data(),
                     };
                     locations.push(selectedItem);
-                }});
+                } return locations;
+            });
             return res.status(OK).send({
                 data: { locations },
                 status: 'success',
             });
         } catch (error) {
-            return res.status(INTERNAL_SERVER_ERROR).send({
-                error,
-                message: getStatusText(INTERNAL_SERVER_ERROR),
-                status: 'error',
-            });
+            errorHandler.tryCatchError(res, error);
         }
     },
 
@@ -110,11 +88,7 @@ const Locations = {
                 status: 'success',
             });
         } catch (error) {
-            return res.status(INTERNAL_SERVER_ERROR).send({
-                error,
-                message: getStatusText(INTERNAL_SERVER_ERROR),
-                status: 'error',
-            });
+            errorHandler.tryCatchError(res, error);
         }
     },
 
@@ -122,24 +96,15 @@ const Locations = {
         try {
             const document = db.collection('locations').doc(req.params.id);
 
-            if (!document) {
-                return res.status(NOT_FOUND).send({
-                    status: 'error',
-                    message: getStatusText(NOT_FOUND),
-                });
-            }
+            if (!document) errorHandler.validationError(res, errors);
             const location = await document.update(req.body);
 
             return res.status(CREATED).send({
-                status: 'success',
                 data: { location, message: 'Comment successfully updated' },
+                status: 'success',
             });
         } catch (error) {
-            return res.status(INTERNAL_SERVER_ERROR).send({
-                status: 'error',
-                message: getStatusText(INTERNAL_SERVER_ERROR),
-                error,
-            });
+            errorHandler.tryCatchError(res, error);
         }
     },
 };
