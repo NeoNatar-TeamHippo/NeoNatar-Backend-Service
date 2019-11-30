@@ -72,7 +72,7 @@ class userController {
             await uploadRequest(imageToBeUploaded, token);
             const avatar = getFirebaseLink(imageToBeUploaded.originalname, token);
             await db.doc(`/users/${userId}`).update({ avatar });
-            return successNoData(res, OK, avatar);
+            return successNoData(res, OK, 'Avatar uploaded successfully');
         } catch (error) {
             return tryCatchError(res, error);
         }
