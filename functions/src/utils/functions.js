@@ -20,12 +20,12 @@ const superAdmin = (isAdmin, role, status) => {
     }
     else return false;
 };
-const uploadRequest = async (imageToBeUploaded, token) => {
+const uploadRequest = async ({ filepath, mimetype }, token) => {
     try {
-        return await admin.storage().bucket().upload(imageToBeUploaded.filepath, {
+        return await admin.storage().bucket().upload(filepath, {
             metadata: {
                 metadata: {
-                    contentType: imageToBeUploaded.mimetype,
+                    contentType: mimetype,
                     firebaseStorageDownloadTokens: token,
                 },
             },
