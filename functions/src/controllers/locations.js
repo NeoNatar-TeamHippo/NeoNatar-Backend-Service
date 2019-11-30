@@ -20,6 +20,7 @@ const Locations = {
             const { valid, errors } = await validateLocationInput(req.body);
             if (!valid) validationError(res, errors);
             req.body.createdAt = new Date().toISOString();
+            req.body.createdBy = req.user;
             if (valid) {
                 await db.collection('locations').doc().create(req.body).then(
                     ref => ref);
@@ -83,6 +84,7 @@ const Locations = {
             const { valid, errors } = await validateLocationInput(req.body);
             if (!valid) validationError(res, errors);
             req.body.updatedAt = new Date().toISOString();
+            req.body.updatedBy = req.user;
             if (valid) {
                 await document.update(req.body);
                 return successNoData(res, CREATED, 'Location successfully updated');
