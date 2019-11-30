@@ -1,6 +1,8 @@
 const { firebaseConfig } = require('../config/index');
-// eslint-disable-next-line max-len
-const getFirebaseLink = filename => `https://firebaseestorage.googleapis.com/v0/b/${firebaseConfig.storageBucket}/o/${filename}?alt=media`;
+const { admin } = require('../utils/firebase');
+const url = `https://firebasestorage.googleapis.com/v0/b/${firebaseConfig.storageBucket}`;
+const amt = 'alt=media&token=';
+const getFirebaseLink = (filename, token) => `${url}/o/${filename}?${amt}${token}`;
 const createUserData = (avatar, email, firstName, lastName, userId, isAdmin) => ({
     avatar,
     createdAt: new Date().toISOString(),
@@ -18,6 +20,22 @@ const superAdmin = (isAdmin, role, status) => {
     }
     else return false;
 };
+const uploadRequest = async (imageToBeUploaded, token) => {
+    try {
+        return await admin.storage().bucket().upload(imageToBeUploaded.filepath, {
+            metadata: {
+                metadata: {
+                    contentType: imageToBeUploaded.mimetype,
+                    firebaseStorageDownloadTokens: token,
+                },
+            },
+            resumable: false,
+        });
+    } catch (error) {
+        console.error(error);
+    }
+
+};
 module.exports = {
-    createUserData, getFirebaseLink, superAdmin,
+    createUserData, getFirebaseLink, superAdmin, uploadRequest,
 };

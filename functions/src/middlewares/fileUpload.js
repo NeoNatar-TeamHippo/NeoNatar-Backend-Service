@@ -3,7 +3,6 @@ const path = require('path');
 const os = require('os');
 const fs = require('fs');
 //TODO: fix refactor code to async await
-//FIXME: make data uploaded public either from console or code
 /**
  * File Uploader middleware handle multipart data upload to server
  * @function

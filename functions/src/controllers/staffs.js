@@ -85,9 +85,12 @@ class staffController {
             const { id } = req.params;
             const { status, type } = req.query;
             await db.doc(`/users/${id}`).update({ status: status });
-            return successNoData(res, OK,
-                // eslint-disable-next-line max-len
-                `${type === 'staff' ? 'Staff' : 'User'} ${status === 'active' ? 'activated' : 'deactivated'} successfully`);
+            let newStatus, userType;
+            if (status === 'active') newStatus = 'activated';
+            newStatus = 'deactivated';
+            if (type === 'staff') userType = 'Staff';
+            userType = 'User';
+            return successNoData(res, OK, `${userType} ${newStatus} successfully`);
         } catch (error) {
             return tryCatchError(res, error);
         }

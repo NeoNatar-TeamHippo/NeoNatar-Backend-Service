@@ -1,10 +1,12 @@
 const { CREATED, OK } = require('http-status-codes');
+const uuidv5 = require('uuid/v5');
 const { firebase, admin, db } = require('../utils/firebase');
 const { validationError, tryCatchError } = require('../utils/errorHandler');
 const { successNoData, successWithData, successNoMessage } = require('../utils/successHandler');
 const { validateSignInData, validateSignUpData,
     validateUpdateProfile } = require('../validations/user');
-const { getFirebaseLink, createUserData, superAdmin } = require('../utils/functions');
+const { getFirebaseLink, createUserData, superAdmin,
+    uploadRequest } = require('../utils/functions');
 class userController {
     /**
 	 * A user sign up route, creates a new dataset in the firestore.
@@ -66,13 +68,11 @@ class userController {
         try {
             const imageToBeUploaded = req.files[0];
             const { userId } = req.user;
-            await admin.storage().bucket().upload(imageToBeUploaded.filepath, {
-                metadata: { metadata: { contentType: imageToBeUploaded.mimetype } },
-                resumable: false,
-            });
-            const avatar = getFirebaseLink(imageToBeUploaded.originalname);
+            const token = uuidv5(`${userId}`, uuidv5.URL);
+            await uploadRequest(imageToBeUploaded, token);
+            const avatar = getFirebaseLink(imageToBeUploaded.originalname, token);
             await db.doc(`/users/${userId}`).update({ avatar });
-            return successNoData(res, OK, 'Avatar uploaded success');
+            return successNoData(res, OK, avatar);
         } catch (error) {
             return tryCatchError(res, error);
         }
