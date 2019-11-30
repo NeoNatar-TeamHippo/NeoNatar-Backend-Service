@@ -5,7 +5,7 @@ const {
 const { db } = require('../utils/firebase');
 const validateLocationInput = require('../validations/locationInput');
 const { tryCatchError, validationError } = require('../utils/errorHandler');
-const { successNOData, successNoMessage } = require('../utils/successHandler');
+const { successNoData, successNoMessage } = require('../utils/successHandler');
 
 const Locations = {
     /**
@@ -17,19 +17,14 @@ const Locations = {
 	*/
     async create(req, res) {
         try {
-            const {
-                address, coords, country, image, lga, name, price, state, status, trafficRate,
-            } = req.body;
-            const data = {
-                address, coords, country, image, lga, name, price, state, status, trafficRate,
-            };
-            const { valid, errors } = await validateLocationInput(data);
+            const { valid, errors } = await validateLocationInput(req.body);
             if (!valid) validationError(res, errors);
-            data.createdAt = new Date().toISOString();
+            req.body.createdAt = new Date().toISOString();
+            req.body.createdBy = req.user.uid;
             if (valid) {
-                await db.collection('locations').doc().create(data).then(
+                await db.collection('locations').doc().create(req.body).then(
                     ref => ref);
-                return successNOData(res, CREATED, 'Location successfully created');
+                return successNoData(res, CREATED, 'Location successfully created');
             }
         } catch (error) {
             return tryCatchError(res, error);
@@ -49,7 +44,6 @@ const Locations = {
         }
     },
 
-    // eslint-disable-next-line max-lines-per-function
     async getAll(req, res) {
         try {
             const locations = [];
@@ -86,12 +80,15 @@ const Locations = {
     async updateLocation(req, res) {
         try {
             const document = db.collection('locations').doc(req.params.id);
-
             if (!document) validationError(res, errors);
+            const { valid, errors } = await validateLocationInput(req.body);
+            if (!valid) validationError(res, errors);
             req.body.updatedAt = new Date().toISOString();
-            await document.update(req.body);
-
-            return successNOData(res, CREATED, 'Location successfully updated');
+            req.body.updatedBy = req.user.uid;
+            if (valid) {
+                await document.update(req.body);
+                return successNoData(res, CREATED, 'Location successfully updated');
+            }
         } catch (error) {
             tryCatchError(res, error);
         }
