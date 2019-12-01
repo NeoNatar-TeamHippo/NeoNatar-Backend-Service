@@ -37,16 +37,16 @@ const uploadRequest = async ({ filepath, mimetype }, token) => {
         console.error(error);
     }
 };
-const updateVideo = async (videoId, filePath) => {
+const updateVideo = async (videoId, filePath, { description, title }) => {
     try {
         const { url, id } = await uploads(filePath);
         const duration = await getVideoDurationInSeconds(filePath);
         await deleteUpload(videoId);
-        return {
-            duration: Math.round(duration),
-            newId: id,
-            newUrl: url,
+        const updatedObj = {
+            description, duration: Math.round(duration), title, updatedAt: new Date().toISOString(),
+            url, videoId: id,
         };
+        return updatedObj;
     } catch (error) {
         console.error(error);
     }

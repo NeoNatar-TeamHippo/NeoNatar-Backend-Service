@@ -92,7 +92,6 @@ class commercialController {
     * @param {object} res - response object
     * @return  {Object} result
     */
-    // eslint-disable-next-line max-lines-per-function
     static async update(req, res) {
         try {
             const { id } = req.params;
@@ -103,11 +102,8 @@ class commercialController {
             if (!docs) return validationError(res, 'Document not found');
             const result = await docs.get();
             const { videoId } = await result.data();
-            const { duration, newId, newUrl } = await updateVideo(videoId, req.files[0].filepath);
-            const updatedObj = {
-                description, duration, title, updatedAt: new Date().toISOString(),
-                url: newUrl, videoId: newId,
-            };
+            const updatedObj = await updateVideo(videoId, req.files[0].filepath,
+                { description, title });
             await docs.update(updatedObj);
             return successNoData(res, OK, 'Commercial successfully updated');
         } catch (error) {
