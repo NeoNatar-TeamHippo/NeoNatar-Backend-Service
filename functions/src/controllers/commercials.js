@@ -4,7 +4,7 @@ const { firebase, db } = require('../utils/firebase');
 const { uploads } = require('../utils/cloudinaryConfig');
 const { validationError, tryCatchError } = require('../utils/errorHandler');
 const { successNoData, successWithData, successNoMessage } = require('../utils/successHandler');
-// const { } = require('../utils/functions');
+const { updateVideo } = require('../utils/functions');
 const { validateDetails } = require('../validations/commercial');
 class commercialController {
     /**
@@ -92,6 +92,7 @@ class commercialController {
     * @param {object} res - response object
     * @return  {Object} result
     */
+    // eslint-disable-next-line max-lines-per-function
     static async update(req, res) {
         try {
             const { id } = req.params;
@@ -100,12 +101,14 @@ class commercialController {
             if (!valid) return validationError(res, errors);
             const docs = await db.collection('commercials').doc(id);
             if (!docs) return validationError(res, 'Document not found');
-            const { videoId } = docs.get().data();
-            const { duration, newId, newUrl } = handleUpdateVideo(videoId, req.files[0].filepath);
+            const result = await docs.get();
+            const { videoId } = await result.data();
+            const { duration, newId, newUrl } = await updateVideo(videoId, req.files[0].filepath);
             const updatedObj = {
                 description, duration, title, updatedAt: new Date().toISOString(),
                 url: newUrl, videoId: newId,
             };
+            console.log(updatedObj);
             await docs.update(updatedObj);
             return successNoData(res, OK, 'Commercial successfully updated');
         } catch (error) {

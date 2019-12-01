@@ -37,11 +37,11 @@ const uploadRequest = async ({ filepath, mimetype }, token) => {
         console.error(error);
     }
 };
-const handleUpdateVideo = async (videoId, filePath) => {
+const updateVideo = async (videoId, filePath) => {
     try {
-        await deleteUpload(videoId);
         const { url, id } = await uploads(filePath);
         const duration = await getVideoDurationInSeconds(filePath);
+        await deleteUpload(videoId);
         return {
             duration: Math.round(duration),
             newId: id,
@@ -52,5 +52,5 @@ const handleUpdateVideo = async (videoId, filePath) => {
     }
 };
 module.exports = {
-    createUserData, getFirebaseLink, handleUpdateVideo, superAdmin, uploadRequest,
+    createUserData, getFirebaseLink, superAdmin, updateVideo, uploadRequest,
 };
