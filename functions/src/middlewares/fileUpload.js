@@ -2,8 +2,9 @@ const Busboy = require('busboy');
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
+const { getVideoDurationInSeconds } = require('get-video-duration');
 const { validationError, tryCatchError } = require('../utils/errorHandler');
-//TODO: fix refactor code to async await
+//TODO: fix refactor code to async await and check for limits size for image or video mimetype
 /**
  * File Uploader middleware handle multipart data upload to server
  * @function
@@ -22,9 +23,6 @@ exports.filesUpload = function (req, res, next) {
     busboy.on('field', (key, value) => { fields[key] = value; });
     // eslint-disable-next-line max-lines-per-function
     busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
-        if (mimetype !== 'image/jpeg' || mimetype !== 'image/png') {
-            return validationError(res, 'Invalid file type');
-        }
         const imageExtension = filename.split('.')[filename.split('.').length - 1];
         const imageFileName = `${Math.round(Math.random() * 10000000000)}.${imageExtension}`;
         const filepath = path.join(os.tmpdir(), imageFileName);
@@ -37,8 +35,8 @@ exports.filesUpload = function (req, res, next) {
                     const size = Buffer.byteLength(buffer);
                     if (err) return reject(err);
                     files.push({
-                        buffer, encoding, fieldname, filepath, mimetype,
-                        originalname: imageFileName, size,
+                        buffer, encoding,
+                        fieldname, filepath, mimetype, originalname: imageFileName, size,
                     });
                     try {
                         console.log(filepath);
