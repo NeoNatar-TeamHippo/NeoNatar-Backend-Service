@@ -1,5 +1,7 @@
+const { getVideoDurationInSeconds } = require('get-video-duration');
 const { firebaseConfig } = require('../config/index');
 const { admin } = require('../utils/firebase');
+const { deleteUpload, uploads } = require('../utils/cloudinaryConfig');
 const url = `https://firebasestorage.googleapis.com/v0/b/${firebaseConfig.storageBucket}`;
 const amt = 'alt=media&token=';
 const getFirebaseLink = (filename, token) => `${url}/o/${filename}?${amt}${token}`;
@@ -20,12 +22,12 @@ const superAdmin = (isAdmin, role, status) => {
     }
     else return false;
 };
-const uploadRequest = async (imageToBeUploaded, token) => {
+const uploadRequest = async ({ filepath, mimetype }, token) => {
     try {
-        return await admin.storage().bucket().upload(imageToBeUploaded.filepath, {
+        return await admin.storage().bucket().upload(filepath, {
             metadata: {
                 metadata: {
-                    contentType: imageToBeUploaded.mimetype,
+                    contentType: mimetype,
                     firebaseStorageDownloadTokens: token,
                 },
             },
@@ -34,8 +36,21 @@ const uploadRequest = async (imageToBeUploaded, token) => {
     } catch (error) {
         console.error(error);
     }
-
+};
+const updateVideo = async (videoId, filePath, { description, title }) => {
+    try {
+        const { url, id } = await uploads(filePath);
+        const duration = await getVideoDurationInSeconds(filePath);
+        await deleteUpload(videoId);
+        const updatedObj = {
+            description, duration: Math.round(duration), title, updatedAt: new Date().toISOString(),
+            url, videoId: id,
+        };
+        return updatedObj;
+    } catch (error) {
+        console.error(error);
+    }
 };
 module.exports = {
-    createUserData, getFirebaseLink, superAdmin, uploadRequest,
+    createUserData, getFirebaseLink, superAdmin, updateVideo, uploadRequest,
 };

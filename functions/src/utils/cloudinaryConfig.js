@@ -16,5 +16,9 @@ const uploads = file => new Promise(resolve => {
         { resource_type: 'video' },
     );
 });
+const deleteUpload = id => cloudinary.uploader.destroy(
+    id, result => { console.log(result, `Deleted ${id} successfully`); },
+    { resource_type: 'video' }
+);
 
-module.exports = uploads;
+module.exports = { deleteUpload, uploads };
