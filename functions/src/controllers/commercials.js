@@ -108,7 +108,6 @@ class commercialController {
                 description, duration, title, updatedAt: new Date().toISOString(),
                 url: newUrl, videoId: newId,
             };
-            console.log(updatedObj);
             await docs.update(updatedObj);
             return successNoData(res, OK, 'Commercial successfully updated');
         } catch (error) {
