@@ -1,5 +1,6 @@
-const { FORBIDDEN, BAD_REQUEST } = require('http-status-codes');
+const { FORBIDDEN, BAD_REQUEST, UNAUTHORIZED } = require('http-status-codes');
 const { admin } = require('../utils/firebase');
+
 const FBauth = async (req, res, next) => {
     try {
         let idToken;
@@ -20,6 +21,7 @@ const FBauth = async (req, res, next) => {
         return res.status(FORBIDDEN).json({ message: error.message, status: 'error' });
     }
 };
+
 const isSuperAdmin = async (req, res, next) => {
     try {
         const { userId, role, isAdmin, status } = req.user;

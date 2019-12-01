@@ -9,7 +9,7 @@ const { functions } = require('./src/utils/firebase');
 const app = express();
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 app.use(morgan('dev'));
 //Use Routes Here
