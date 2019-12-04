@@ -27,5 +27,14 @@ module.exports = {
         projectId: process.env.PROJECT_ID,
         storageBucket: process.env.STORAGE_BUCKET,
     },
+    savedLocationInput: {
+        address: 'address',
+        country: 'country',
+        lga: 'lga',
+        name: 'name',
+        price: 'price',
+        state: 'state',
+        trafficRate: 'trafficRate',
+    },
 
 };
