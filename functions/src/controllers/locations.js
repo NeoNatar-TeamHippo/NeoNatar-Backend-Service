@@ -87,7 +87,7 @@ const Locations = {
             req.body.updatedBy = req.user.uid;
             if (valid) {
                 await document.update(req.body);
-                return successNoData(res, CREATED, 'Location successfully updated');
+                return successNoData(res, OK, 'Location successfully updated');
             }
         } catch (error) {
             tryCatchError(res, error);

@@ -27,6 +27,9 @@ class userController {
             await db.doc(`users/${data.user.uid}`).set(userData);
             return successWithData(res, CREATED, `Sign up successful`, token);
         } catch (error) {
+            if (error.code === 'auth/email-already-in-use') {
+                return validationError(res, 'Email already in use');
+            }
             return tryCatchError(res, error);
         }
     }
