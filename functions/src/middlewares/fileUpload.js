@@ -2,7 +2,9 @@ const Busboy = require('busboy');
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
-//TODO: fix refactor code to async await
+const { getVideoDurationInSeconds } = require('get-video-duration');
+const { validationError, tryCatchError } = require('../utils/errorHandler');
+//TODO: fix refactor code to async await and check for limits size for image or video mimetype
 /**
  * File Uploader middleware handle multipart data upload to server
  * @function
@@ -33,8 +35,8 @@ exports.filesUpload = function (req, res, next) {
                     const size = Buffer.byteLength(buffer);
                     if (err) return reject(err);
                     files.push({
-                        buffer, encoding, fieldname, filepath, mimetype,
-                        originalname: imageFileName, size,
+                        buffer, encoding,
+                        fieldname, filepath, mimetype, originalname: imageFileName, size,
                     });
                     try {
                         console.log(filepath);

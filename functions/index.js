@@ -27,5 +27,4 @@ app.use((err, req, res, next) => {
         },
     });
 });
-
-exports.api = functions.https.onRequest(app);
+exports.api = functions.region('europe-west1').https.onRequest(app);

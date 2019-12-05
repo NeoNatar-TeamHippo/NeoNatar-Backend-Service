@@ -8,7 +8,7 @@ class ErrorHandler {
     }
     static tryCatchError(res, error) {
         console.error(error);
-        return res.status(error.code).json({
+        return res.status(INTERNAL_SERVER_ERROR).json({
             message: error.message,
             status: 'error',
         });

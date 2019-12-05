@@ -17,6 +17,11 @@ module.exports = {
         token_uri: process.env.TOKEN_URI,
         type: process.env.TYPE,
     },
+    cloudinaryConfig: {
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET,
+        cloud_name: process.env.CLOUD_NAME,
+    },
     firebaseConfig: {
         apiKey: process.env.APIKEY,
         appId: process.env.APPID,
