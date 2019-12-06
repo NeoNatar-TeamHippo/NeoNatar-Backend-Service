@@ -19,12 +19,11 @@ const SavedLocations = {
         try {
             const { valid, errors } = await validateSavedLocationInput(req.body.location);
             if (!valid) validationError(res, errors);
-            const { userId } = req.user;
             const createdAt = new Date().toISOString();
             req.body.createdAt = createdAt;
             req.body.createdBy = req.user.uid;
             if (valid) {
-                await db.collection('savedLocations').doc(`${userId}${createdAt}`).create(req.body)
+                await db.collection('savedLocations').doc().create(req.body)
                     .then(
                         ref => ref);
                 return successNoData(res, CREATED, 'Saved Locations successfully created');
@@ -50,16 +49,17 @@ const SavedLocations = {
     async getAll(req, res) {
         try {
             const savedLocations = [];
-            await db.collection('savedLocations').get().then(querySnapshot => {
-                const docs = querySnapshot.docs;
-                for (const doc of docs) {
-                    const selectedItem = {
-                        id: doc.id,
-                        savedLocation: doc.data(),
-                    };
-                    savedLocations.push(selectedItem);
-                } return savedLocations;
-            });
+            await db.collection('savedLocations').where('createdBy', '==', userId)
+                .orderBy('createdAt', 'desc').get().then(querySnapshot => {
+                    const docs = querySnapshot.docs;
+                    for (const doc of docs) {
+                        const selectedItem = {
+                            id: doc.id,
+                            savedLocation: doc.data(),
+                        };
+                        savedLocations.push(selectedItem);
+                    } return savedLocations;
+                });
             return successNoMessage(res, OK, savedLocations);
         } catch (error) {
             tryCatchError(res, error);
@@ -74,6 +74,9 @@ const SavedLocations = {
             }
             const documentData = await document.get();
             const savedLocations = documentData.data();
+            if(savedLocations.createdBy !== req.user.uid) {
+                return validationError(res, 'Not Authorized');
+            }
             return successNoMessage(res, OK, savedLocations);
         } catch (error) {
             tryCatchError(res, error);
