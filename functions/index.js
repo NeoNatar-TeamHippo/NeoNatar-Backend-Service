@@ -48,6 +48,27 @@ exports.signUpEmailNotification = functions.region('europe-west1')
             console.log(error);
         }
     });
+exports.deactivatedEmailNotification = functions.region('europe-west1')
+    .firestore.document('users/{userId}').onUpdate(async change => {
+        try {
+            const { email, firstName, lastName, status, userId } = change.before.data();
+            const statusBefore = change.before.data().status;
+            const statusAfter = change.after.data().status;
+            if (statusBefore !== statusAfter) {
+                const receipent = email, subject = `${statusAfter}ed from NeoNatar`;
+                const text = `Dear ${firstName} ${lastName}, due to some reasons you
+                have been deactivated, please contact the admins`;
+                await sendText(receipent, subject, text);
+                const dataToAdd = {
+                    createdAt: new Date().toISOString(), id: userId,
+                    message: 'Deactivated from NeoNatar', read: false, type: 'users', userId,
+                };
+                return await db.collection('notifications').add(dataToAdd);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    });
 exports.newCommercialNotification = functions.region('europe-west1')
     .firestore.document('commercials/{commercialId}').onCreate(async snapshot => {
         try {
