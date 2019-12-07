@@ -1,6 +1,6 @@
-import nodemailer from 'nodemailer';
-import smtpTransport from 'nodemailer-smtp-transport';
-import { nodemailerConfig } from '../config';
+const nodemailer = require('nodemailer');
+const smtpTransport = require('nodemailer-smtp-transport');
+const { nodemailerConfig } = require('../config');
 const { user, pass } = nodemailerConfig;
 const transportOptions = smtpTransport({
     auth: { pass, user },
@@ -9,17 +9,20 @@ const transportOptions = smtpTransport({
         rejectUnauthorized: false,
     },
 });
-class EmailService {
-    constructor() {
-        this.emailClient = nodemailer.createTransport(transportOptions);
-    }
+const emailClient = nodemailer.createTransport(transportOptions);
 
-    async sendText(to, subject, text) {
-        const res = await this.emailClient.sendMail({
+const sendText = async (to, subject, text) => {
+    try {
+        const res = await emailClient.sendMail({
             from: user,
             subject, text, to,
         });
         return res;
+    } catch (error) {
+        console.log(error);
     }
-}
-export default new EmailService();
+};
+
+module.exports = {
+    sendText,
+};
