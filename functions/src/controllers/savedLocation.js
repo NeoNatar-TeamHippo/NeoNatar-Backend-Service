@@ -49,7 +49,8 @@ const SavedLocations = {
     async getAll(req, res) {
         try {
             const savedLocations = [];
-            await db.collection('savedLocations').where('createdBy', '==', userId)
+            const { uid } = req.user;
+            await db.collection('savedLocations').where('createdBy', '==', uid )
                 .orderBy('createdAt', 'desc').get().then(querySnapshot => {
                     const docs = querySnapshot.docs;
                     for (const doc of docs) {

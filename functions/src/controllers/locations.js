@@ -23,11 +23,10 @@ const Locations = {
             if (!valid) validationError(res, errors);
             req.body.createdAt = new Date().toISOString();
             req.body.createdBy = req.user.uid;
-            const imagesToBeUploaded = req.files;
             const { userId } = req.user;
             const token = uuidv5(`${userId}`, uuidv5.URL);
-            await uploadMultipleImages(imagesToBeUploaded, token);
-            req.body.images = await getMultipleFirebaseLink(imagesToBeUploaded, token);
+            await uploadMultipleImages(req.files, token);
+            req.body.images = await getMultipleFirebaseLink(req.files, token);
             if (valid) {
                 await db.collection('locations').doc().create(req.body).then(
                     ref => ref);
@@ -90,6 +89,10 @@ const Locations = {
             if (!document) validationError(res, errors);
             const { valid, errors } = await validateLocationInput(req.body);
             if (!valid) validationError(res, errors);
+            const { userId } = req.user;
+            const token = uuidv5(`${userId}`, uuidv5.URL);
+            await uploadMultipleImages(req.files, token);
+            req.body.images = await getMultipleFirebaseLink(req.files, token);
             req.body.updatedAt = new Date().toISOString();
             req.body.updatedBy = req.user.uid;
             if (valid) {
