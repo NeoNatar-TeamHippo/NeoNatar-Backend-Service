@@ -1,8 +1,10 @@
 const {
     CREATED, OK,
 } = require('http-status-codes');
+const uuidv5 = require('uuid/v5');
 
 const { db } = require('../utils/firebase');
+const { getMultipleFirebaseLink, uploadMultipleImages } = require('../utils/functions');
 const validateLocationInput = require('../validations/locationInput');
 const { tryCatchError, validationError } = require('../utils/errorHandler');
 const { successNoData, successNoMessage } = require('../utils/successHandler');
@@ -21,6 +23,11 @@ const Locations = {
             if (!valid) validationError(res, errors);
             req.body.createdAt = new Date().toISOString();
             req.body.createdBy = req.user.uid;
+            const imagesToBeUploaded = req.files;
+            const { userId } = req.user;
+            const token = uuidv5(`${userId}`, uuidv5.URL);
+            await uploadMultipleImages(imagesToBeUploaded, token);
+            req.body.images = await getMultipleFirebaseLink(imagesToBeUploaded, token);
             if (valid) {
                 await db.collection('locations').doc().create(req.body).then(
                     ref => ref);

@@ -64,6 +64,22 @@ const getLocationsAmount = async locationarray => {
     });
     return await Promise.all(price);
 };
+const uploadMultipleImages = async (images, token) => {
+    const promises = [];
+    images.forEach(image => {
+        promises.push(uploadRequest(image, token));
+
+    });
+    return await Promise.all(promises);
+};
+const getMultipleFirebaseLink = async (images, token) => {
+    const promises = [];
+    images.forEach(image => {
+        promises.push(getFirebaseLink(image.originalname, token));
+    });
+    return await Promise.all(promises);
+}; 
 module.exports = {
-    createUserData, getFirebaseLink, getLocationsAmount, superAdmin, updateVideo, uploadRequest,
+    createUserData, getFirebaseLink, getLocationsAmount, getMultipleFirebaseLink, superAdmin, 
+    updateVideo, uploadMultipleImages, uploadRequest,
 };
