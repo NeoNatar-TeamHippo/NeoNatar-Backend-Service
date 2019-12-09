@@ -24,6 +24,15 @@ const createTicketData = (title, priority, userId) => ({
     status: 'new',
     title,
 });
+const createTransactionData = (campaignObj, userObj, campaignId) => ({
+    amount: campaignObj.amount,
+    campaignId,
+    createdAt: new Date().toISOString(),
+    createdBy: campaignObj.createdBy,
+    status: 'valid',
+    title: campaignObj.title,
+    userName: `${userObj.firstName} ${userObj.lastName}`,
+});
 const createMessageData = (body, isAdmin, userId) => ({
     body,
     createdAt: new Date().toISOString(),
@@ -66,6 +75,6 @@ const updateVideo = async (videoId, filePath, { description, title }) => {
     }
 };
 module.exports = {
-    createMessageData, createTicketData, createUserData, getFirebaseLink,
+    createMessageData, createTicketData, createTransactionData, createUserData, getFirebaseLink,
     superAdmin, updateVideo, uploadRequest,
 };

@@ -86,10 +86,11 @@ class ticketController {
             const { userId, isAdmin } = req.user;
             let data;
             if (isAdmin) {
-                data = await db.collection('tickets').get();
+                data = await db.collection('tickets').orderBy('createdAt', 'desc').get();
             }
             else {
-                data = await db.collection('tickets').where('createdBy', '==', userId).get();
+                data = await db.collection('tickets').where('createdBy', '==', userId)
+                    .orderBy('createdAt', 'desc').get();
             }
             const docs = data.docs;
             const tickets = docs.map(doc => ({ id: doc.id, ticket: doc.data() }));

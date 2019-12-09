@@ -5,6 +5,7 @@ const commercials = require('./commercials');
 const savedLocation = require('./savedLocation');
 const notifications = require('./notifications');
 const tickets = require('./tickets');
+const transactions = require('./transactions');
 
 const init = app => {
     app.use('/v1/locations', locations);
@@ -14,6 +15,7 @@ const init = app => {
     app.use('/v1/savedlocation', savedLocation);
     app.use('/v1/notifications', notifications);
     app.use('/v1/tickets', tickets);
+    app.use('/v1/transactions', transactions);
 };
 
 module.exports = {
