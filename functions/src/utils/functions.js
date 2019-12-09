@@ -4,7 +4,25 @@ const { admin } = require('../utils/firebase');
 const { deleteUpload, uploads } = require('../utils/cloudinaryConfig');
 const url = `https://firebasestorage.googleapis.com/v0/b/${firebaseConfig.storageBucket}`;
 const amt = 'alt=media&token=';
+/**
+    * returns a firebase image url link
+    * @function
+    * @param {String} filename - the image filename
+    * @param {String} token - token to give access
+    * @return  {String} url
+    */
 const getFirebaseLink = (filename, token) => `${url}/o/${filename}?${amt}${token}`;
+/**
+    * returns a user object created
+    * @function
+    * @param {String} avatar - the image url
+    * @param {String} email - user's email
+    * @param {String} firstName - user's firstname
+    * @param {String} lastName - user's lastname
+    * @param {String} userId - user's id
+    * @param {Boolean} isAdmin - user admin status
+    * @return  {Object} user object
+    */
 const createUserData = (avatar, email, firstName, lastName, userId, isAdmin) => ({
     avatar,
     createdAt: new Date().toISOString(),
@@ -16,6 +34,14 @@ const createUserData = (avatar, email, firstName, lastName, userId, isAdmin) => 
     status: 'active',
     userId,
 });
+/**
+    * returns a ticket created
+    * @function
+    * @param {String} title - ticket's title
+    * @param {String} priority - ticket's priority
+    * @param {String} userId - user's id
+    * @return  {Object} ticket's object
+    */
 const createTicketData = (title, priority, userId) => ({
     createdAt: new Date().toISOString(),
     createdBy: userId,
@@ -24,27 +50,41 @@ const createTicketData = (title, priority, userId) => ({
     status: 'new',
     title,
 });
-const createTransactionData = (campaignObj, userObj, campaignId) => ({
-    amount: campaignObj.amount,
-    campaignId,
-    createdAt: new Date().toISOString(),
-    createdBy: campaignObj.createdBy,
-    status: 'valid',
-    title: campaignObj.title,
-    userName: `${userObj.firstName} ${userObj.lastName}`,
-});
+/**
+    * returns a message object created
+    * @function
+    * @param {String} body - message body
+    * @param {Boolean} isAdmin - user admin status
+    * @param {String} userId - user's id
+    * @return  {Object} message's object
+    */
 const createMessageData = (body, isAdmin, userId) => ({
     body,
     createdAt: new Date().toISOString(),
     createdBy: userId,
     isAdmin,
 });
+/**
+    * returns a a boolean to check if a user is a super admin or not
+    * @function
+    * @param {String} role - user's role
+    * @param {Boolean} isAdmin - user admin status
+    * @param {String} status - user's status
+    * @return  {Boolean} result
+    */
 const superAdmin = (isAdmin, role, status) => {
     if (isAdmin && role === 'superAdmin' && status === 'active') {
         return true;
     }
     else return false;
 };
+/**
+    * function to handle image upload
+    * @function
+    * @param {Object} - image object
+    * @param {String} token - token to handle image authorization
+    * @return  {Boolean} result
+    */
 const uploadRequest = async ({ filepath, mimetype }, token) => {
     try {
         return await admin.storage().bucket().upload(filepath, {
@@ -60,6 +100,15 @@ const uploadRequest = async ({ filepath, mimetype }, token) => {
         console.error(error);
     }
 };
+/**
+    * function to handle video upload
+    * @function
+    * @param {String} videoId - video id gotten from cloudinary
+    * @param {String} filePath - video file path gotten from busboy
+    * @param {Object} - description and title
+    * @param {String} token - token to handle image authorization
+    * @return  {Boolean} result
+    */
 const updateVideo = async (videoId, filePath, { description, title }) => {
     try {
         const { url, id } = await uploads(filePath);
@@ -75,6 +124,11 @@ const updateVideo = async (videoId, filePath, { description, title }) => {
     }
 };
 module.exports = {
-    createMessageData, createTicketData, createTransactionData, createUserData, getFirebaseLink,
-    superAdmin, updateVideo, uploadRequest,
+    createMessageData,
+    createTicketData,
+    createUserData,
+    getFirebaseLink,
+    superAdmin,
+    updateVideo,
+    uploadRequest,
 };
