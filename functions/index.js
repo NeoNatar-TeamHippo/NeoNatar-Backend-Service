@@ -34,9 +34,10 @@ exports.signUpEmailNotification = functions.region('europe-west1')
         try {
             const { email, firstName, lastName, userId } = snapshot.data();
             const receipent = email;
+            // TODO: convert this to a html template with its own css served for a better view
             const subject = 'Welcome to NeoNatar';
             const text = `Dear ${firstName} ${lastName},
-        reach out to all your esteemed customers suing our platform`;
+        reach out to all your esteemed customers using our platform`;
             await sendText(receipent, subject, text);
             const dataToAdd = {
                 createdAt: new Date().toISOString(),
