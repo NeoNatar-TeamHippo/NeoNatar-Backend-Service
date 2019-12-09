@@ -16,6 +16,20 @@ const createUserData = (avatar, email, firstName, lastName, userId, isAdmin) => 
     status: 'active',
     userId,
 });
+const createTicketData = (title, priority, userId) => ({
+    createdAt: new Date().toISOString(),
+    createdBy: userId,
+    priority,
+    resolvedBy: '',
+    status: 'new',
+    title,
+});
+const createMessageData = (body, isAdmin, userId) => ({
+    body,
+    createdAt: new Date().toISOString(),
+    createdBy: userId,
+    isAdmin,
+});
 const superAdmin = (isAdmin, role, status) => {
     if (isAdmin && role === 'superAdmin' && status === 'active') {
         return true;
@@ -52,5 +66,6 @@ const updateVideo = async (videoId, filePath, { description, title }) => {
     }
 };
 module.exports = {
-    createUserData, getFirebaseLink, superAdmin, updateVideo, uploadRequest,
+    createMessageData, createTicketData, createUserData, getFirebaseLink,
+    superAdmin, updateVideo, uploadRequest,
 };

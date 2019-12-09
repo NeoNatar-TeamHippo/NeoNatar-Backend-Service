@@ -18,10 +18,8 @@ class notifications {
             const data = await db.collection('notifications')
                 .where('userId', '==', userId).where('read', '==', false)
                 .orderBy('createdAt', 'desc').get();
-            const docs = data.docs, notifications = [];
-            for (const doc of docs) {
-                notifications.push({ id: doc.id, notification: doc.data() });
-            }
+            const docs = data.docs;
+            const notifications = docs.map(doc => ({ id: doc.id, notification: doc.data() }));
             if (notifications.length === 0) {
                 return validationError(res, 'No New Notifications for this user');
             }
@@ -32,7 +30,7 @@ class notifications {
     }
 
     /**
-	 * Get all notification, only authenticated users
+	 * Update all notification sent, req is an array of ids
 	 * @function
 	 * @param {object} req - request object
 	 * @param {object} res - response object
