@@ -6,6 +6,7 @@ const morgan = require('morgan');
 const routes = require('./src/routes');
 const { functions, db } = require('./src/utils/firebase');
 const { sendText } = require('./src/utils/emailService');
+const { createTransactionData } = require('./src/utils/functions');
 
 const app = express();
 

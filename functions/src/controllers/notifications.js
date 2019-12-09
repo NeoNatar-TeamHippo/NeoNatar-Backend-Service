@@ -18,7 +18,7 @@ class notifications {
             const data = await db.collection('notifications')
                 .where('userId', '==', userId).where('read', '==', false)
                 .orderBy('createdAt', 'desc').get();
-            const docs = data.docs;
+            const { docs } = data;
             const notifications = docs.map(doc => ({ id: doc.id, notification: doc.data() }));
             if (notifications.length === 0) {
                 return validationError(res, 'No New Notifications for this user');
