@@ -6,6 +6,7 @@ const morgan = require('morgan');
 const routes = require('./src/routes');
 const { functions, db } = require('./src/utils/firebase');
 const { sendText } = require('./src/utils/emailService');
+const { createTransactionData } = require('./src/utils/functions');
 
 const app = express();
 
@@ -62,7 +63,7 @@ exports.deactivatedEmailNotification = functions.region('europe-west1')
                 await sendText(receipent, subject, text);
                 const dataToAdd = {
                     createdAt: new Date().toISOString(), id: userId,
-                    message: 'Deactivated from NeoNatar', read: false, type: 'users', userId,
+                    message: `${statusAfter}ed from NeoNatar`, read: false, type: 'users', userId,
                 };
                 return await db.collection('notifications').add(dataToAdd);
             }
@@ -96,6 +97,27 @@ exports.newLocationNotification = functions.region('europe-west1')
                 read: false, type: 'locations', userId: createdBy,
             };
             return await db.collection('notifications').add(dataToAdd);
+        } catch (error) {
+            console.log(error);
+        }
+    });
+exports.newTransactionNotification = functions.region('europe-west1')
+    .firestore.document('campaigns/{campaignId}').onCreate(async snapshot => {
+        try {
+            const { id: campaignId } = snapshot;
+            const { createdBy } = snapshot.data();
+            const dataToAdd = {
+                campaignId: id, createdAt: new Date().toISOString(),
+                message: 'New Campaign Created', read: false, type: 'campaign', userId: createdBy,
+            };
+            await db.collection('notifications').add(dataToAdd);
+            const docs = await db.collection('campaigns').doc(campaignId).get();
+            const campaignData = docs.data();
+            const userId = campaignData.createdBy;
+            const data = await db.collection('users').where('userId', '==', userId).get();
+            const user = data.docs[0].data();
+            const transactionData = createTransactionData(campaignData, user, campaignId);
+            return await db.collection('transactions').add(transactionData);
         } catch (error) {
             console.log(error);
         }
