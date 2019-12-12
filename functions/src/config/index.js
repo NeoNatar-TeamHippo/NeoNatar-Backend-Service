@@ -32,6 +32,10 @@ module.exports = {
         projectId: process.env.PROJECT_ID,
         storageBucket: process.env.STORAGE_BUCKET,
     },
+    nodemailerConfig: {
+        pass: process.env.PASS,
+        user: process.env.USER,
+    },
     savedLocationInput: {
         address: 'address',
         country: 'country',
