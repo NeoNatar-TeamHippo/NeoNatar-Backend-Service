@@ -65,18 +65,11 @@ const getLocationsAmount = async locationarray => {
     return await Promise.all(price);
 };
 const uploadMultipleImages = async (images, token) => {
-    const promises = [];
-    images.forEach(image => {
-        promises.push(uploadRequest(image, token));
-
-    });
+    const promises = images.map(image => uploadRequest(image, token));
     return await Promise.all(promises);
 };
 const getMultipleFirebaseLink = async (images, token) => {
-    const promises = [];
-    images.forEach(image => {
-        promises.push(getFirebaseLink(image.originalname, token));
-    });
+    const promises = images.map(image => getFirebaseLink(image.originalname, token));
     return await Promise.all(promises);
 }; 
 module.exports = {

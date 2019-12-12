@@ -50,17 +50,16 @@ const SavedLocations = {
         try {
             const savedLocations = [];
             const { uid } = req.user;
-            await db.collection('savedLocations').where('createdBy', '==', uid )
-                .orderBy('createdAt', 'desc').get().then(querySnapshot => {
-                    const docs = querySnapshot.docs;
-                    for (const doc of docs) {
-                        const selectedItem = {
-                            id: doc.id,
-                            savedLocation: doc.data(),
-                        };
-                        savedLocations.push(selectedItem);
-                    } return savedLocations;
-                });
+            const data = await db.collection('savedLocations').where('createdBy', '==', uid )
+                .orderBy('createdAt', 'desc').get();
+            const docs = data.docs;
+            for (const doc of docs) {
+                const selectedItem = {
+                    id: doc.id,
+                    savedLocation: doc.data(),
+                };
+                savedLocations.push(selectedItem);
+            }
             return successNoMessage(res, OK, savedLocations);
         } catch (error) {
             tryCatchError(res, error);

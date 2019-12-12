@@ -53,17 +53,16 @@ const Campaign = {
         try {
             const campaigns = [];
             const { uid } = req.user;
-            await db.collection('campaigns').where('createdBy', '==', uid)
-                .orderBy('createdAt', 'desc').get().then(querySnapshot => {
-                    const docs = querySnapshot.docs;
-                    for (const doc of docs) {
-                        const selectedItem = {
-                            id: doc.id,
-                            campaign: doc.data(),
-                        };
-                        campaigns.push(selectedItem);
-                    } return campaigns;
-                });
+            const data = await db.collection('campaigns').where('createdBy', '==', uid)
+                .orderBy('createdAt', 'desc').get();
+            const docs = data.docs;
+            for (const doc of docs) {
+                const selectedItem = {
+                    id: doc.id,
+                    campaign: doc.data(),
+                };
+                campaigns.push(selectedItem);
+            }
             return successNoMessage(res, OK, campaigns);
         } catch (error) {
             tryCatchError(res, error);
@@ -72,7 +71,7 @@ const Campaign = {
 
     async getOne(req, res) {
         try {
-            const document = db.collection('camapigns').doc(req.params.id);
+            const document = db.collection('campaigns').doc(req.params.id);
             if (!document) {
                 return validationError(res, 'Document not found');
             }
@@ -81,7 +80,7 @@ const Campaign = {
             if(campaign.createdBy !== req.user.uid) {
                 return validationError(res, 'Not Authorized');
             }
-            return successNoMessage(res, OK, savedLocations);
+            return successNoMessage(res, OK, campaign);
         } catch (error) {
             tryCatchError(res, error);
         }

@@ -53,16 +53,15 @@ const Locations = {
     async getAll(req, res) {
         try {
             const locations = [];
-            await db.collection('locations').get().then(querySnapshot => {
-                const docs = querySnapshot.docs;
-                for (const doc of docs) {
-                    const selectedItem = {
-                        id: doc.id,
-                        location: doc.data(),
-                    };
-                    locations.push(selectedItem);
-                } return locations;
-            });
+            const data = await db.collection('locations').get();
+            const docs = data.docs;
+            for (const doc of docs) {
+                const selectedItem = {
+                    id: doc.id,
+                    location: doc.data(),
+                };
+                locations.push(selectedItem);
+            }
             return successNoMessage(res, OK, locations);
         } catch (error) {
             tryCatchError(res, error);
