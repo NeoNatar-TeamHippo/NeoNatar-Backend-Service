@@ -26,9 +26,7 @@ const Campaign = {
             amount = amount.reduce((a, b) => a + b, 0);
             req.body.amount = amount * req.body.duration;
             if (valid) {
-                await db.collection('campaigns').doc().create(req.body)
-                    .then(
-                        ref => ref);
+                await db.collection('campaigns').doc().create(req.body);
                 return successNoData(res, CREATED, 'Campaign successfully created');
             }
         } catch (error) {

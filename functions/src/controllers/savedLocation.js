@@ -23,9 +23,7 @@ const SavedLocations = {
             req.body.createdAt = createdAt;
             req.body.createdBy = req.user.uid;
             if (valid) {
-                await db.collection('savedLocations').doc().create(req.body)
-                    .then(
-                        ref => ref);
+                await db.collection('savedLocations').doc().create(req.body);
                 return successNoData(res, CREATED, 'Saved Locations successfully created');
             }
         } catch (error) {

@@ -28,8 +28,7 @@ const Locations = {
             await uploadMultipleImages(req.files, token);
             req.body.images = await getMultipleFirebaseLink(req.files, token);
             if (valid) {
-                await db.collection('locations').doc().create(req.body).then(
-                    ref => ref);
+                await db.collection('locations').doc().create(req.body);
                 return successNoData(res, CREATED, 'Location successfully created');
             }
         } catch (error) {
