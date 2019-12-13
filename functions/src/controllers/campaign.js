@@ -5,6 +5,8 @@ const {
 const { db } = require('../utils/firebase');
 const validateCampaignInput = require('../validations/campaignInput');
 const { getLocationsAmount } = require('../utils/functions');
+const { input } = require('../config/constant');
+const { pending, approved, live } = input;
 const { tryCatchError, validationError } = require('../utils/errorHandler');
 const { successNoData, successNoMessage } = require('../utils/successHandler');
 
@@ -16,12 +18,63 @@ const Campaign = {
 	 * @param {object} res - response object
 	 * @return  {Object} result
     */
+   
+    async adminGetAll(req, res) {
+        try {
+            const campaigns = [];
+            const data = await db.collection('campaigns').get();
+            const docs = data.docs;
+            for (const doc of docs) {
+                const selectedItem = {
+                    id: doc.id,
+                    campaign: doc.data(),
+                };
+                campaigns.push(selectedItem);
+            }
+            return successNoMessage(res, OK, campaigns);
+        } catch (error) {
+            tryCatchError(res, error);
+        }
+    },
+
+    async adminGetOne(req, res) {
+        try {
+            const document = db.collection('campaigns').doc(req.params.id);
+            if (!document) {
+                return validationError(res, 'Document not found');
+            }
+            const documentData = await document.get();
+            const campaign = documentData.data();
+            return successNoMessage(res, OK, campaign);
+        } catch (error) {
+            tryCatchError(res, error);
+        }
+    },
+
+    async campaignApproved(req, res) {
+        try {
+            const document = db.collection('campaigns').doc(req.params.id);
+            if (!document) validationError(res, errors);
+            req.body.status = approved;
+            req.body.staus = live;
+            req.body.approvedAt = new Date().toISOString();
+            if (valid) {
+                await document.update(req.body);
+                return successNoData(res, CREATED, 'campaign successfully updated');
+            }
+        } catch (error) {
+            tryCatchError(res, error);
+        }
+    },
+
     async create(req, res) {
         try {
             const { valid, errors } = await validateCampaignInput(req.body);
             if (!valid) validationError(res, errors);
             req.body.createdAt = new Date().toISOString();
             req.body.createdBy = req.user.uid;
+            req.body.status = pending;
+            req.body.numberOfLocation = req.body.locationsSelected.length;
             let amount = await getLocationsAmount(req.body.locationsSelected);
             amount = amount.reduce((a, b) => a + b, 0);
             req.body.amount = amount * req.body.duration;
