@@ -50,11 +50,8 @@ const Locations = {
             await db.collection('locations').get().then(querySnapshot => {
                 const docs = querySnapshot.docs;
                 for (const doc of docs) {
-                    const selectedItem = {
-                        id: doc.id,
-                        location: doc.data(),
-                    };
-                    locations.push(selectedItem);
+                    const newObj = Object.assign({}, doc.data(), { locationId: doc.id });
+                    locations.push(newObj);
                 } return locations;
             });
             return successNoMessage(res, OK, locations);
