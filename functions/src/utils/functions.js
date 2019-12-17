@@ -1,6 +1,6 @@
 const { getVideoDurationInSeconds } = require('get-video-duration');
 const { firebaseConfig } = require('../config/index');
-const { admin } = require('../utils/firebase');
+const { db, admin } = require('../utils/firebase');
 const { deleteUpload, uploads } = require('../utils/cloudinaryConfig');
 const url = `https://firebasestorage.googleapis.com/v0/b/${firebaseConfig.storageBucket}`;
 const amt = 'alt=media&token=';
@@ -123,6 +123,27 @@ const updateVideo = async (videoId, filePath, { description, title }) => {
         console.error(error);
     }
 };
+const getLocationdata = async location => {
+    const amount = await db.collection('locations').doc(location);
+    const documentData = await amount.get();
+    const data = documentData.data().price;
+    return Number(data);
+};
+const getLocationsAmount = async locationarray => {
+    const price = [];
+    locationarray.forEach(location => {
+        price.push(getLocationdata(location));
+    });
+    return await Promise.all(price);
+};
+const uploadMultipleImages = async (images, token) => {
+    const promises = images.map(image => uploadRequest(image, token));
+    return await Promise.all(promises);
+};
+const getMultipleFirebaseLink = async (images, token) => {
+    const promises = images.map(image => getFirebaseLink(image.originalname, token));
+    return await Promise.all(promises);
+}; 
 module.exports = {
     createMessageData,
     createTicketData,

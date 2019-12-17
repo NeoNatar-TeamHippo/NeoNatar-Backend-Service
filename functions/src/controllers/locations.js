@@ -1,8 +1,10 @@
 const {
     CREATED, OK,
 } = require('http-status-codes');
+const uuidv5 = require('uuid/v5');
 
 const { db } = require('../utils/firebase');
+const { getMultipleFirebaseLink, uploadMultipleImages } = require('../utils/functions');
 const validateLocationInput = require('../validations/locationInput');
 const { tryCatchError, validationError } = require('../utils/errorHandler');
 const { successNoData, successNoMessage } = require('../utils/successHandler');
@@ -21,9 +23,12 @@ const Locations = {
             if (!valid) validationError(res, errors);
             req.body.createdAt = new Date().toISOString();
             req.body.createdBy = req.user.uid;
+            const { userId } = req.user;
+            const token = uuidv5(`${userId}`, uuidv5.URL);
+            await uploadMultipleImages(req.files, token);
+            req.body.images = await getMultipleFirebaseLink(req.files, token);
             if (valid) {
-                await db.collection('locations').doc().create(req.body).then(
-                    ref => ref);
+                await db.collection('locations').doc().create(req.body);
                 return successNoData(res, CREATED, 'Location successfully created');
             }
         } catch (error) {
@@ -47,13 +52,12 @@ const Locations = {
     async getAll(req, res) {
         try {
             const locations = [];
-            await db.collection('locations').get().then(querySnapshot => {
-                const docs = querySnapshot.docs;
-                for (const doc of docs) {
-                    const newObj = Object.assign({}, doc.data(), { locationId: doc.id });
-                    locations.push(newObj);
-                } return locations;
-            });
+            const data = await db.collection('locations').get();
+            const docs = data.docs;
+            for (const doc of docs) {
+                const newObj = Object.assign({}, doc.data(), { locationId: doc.id });
+                locations.push(newObj);
+            }
             return successNoMessage(res, OK, locations);
         } catch (error) {
             tryCatchError(res, error);
@@ -80,6 +84,10 @@ const Locations = {
             if (!document) validationError(res, errors);
             const { valid, errors } = await validateLocationInput(req.body);
             if (!valid) validationError(res, errors);
+            const { userId } = req.user;
+            const token = uuidv5(`${userId}`, uuidv5.URL);
+            await uploadMultipleImages(req.files, token);
+            req.body.images = await getMultipleFirebaseLink(req.files, token);
             req.body.updatedAt = new Date().toISOString();
             req.body.updatedBy = req.user.uid;
             if (valid) {

@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const { input } = require('../config/constant');
-const { name, price, trafficRate, address, state, lga, country } = input;
+const { commercialId,duration, locationsSelected, status, title, validity } = input;
 /**
  * An helper function to sort and compare data in an array
  * @function
@@ -14,26 +14,24 @@ const arrayCompare = (expectedData, inputData) => {
     return JSON.stringify(stringExpectedData) === JSON.stringify(stringInputData);
 };
 /**
- * An helper function to validate saved Location input
+ * An helper function to validate campaign input
  * @function
  * @param [array] datas - data to validata
  * @return  {object} result
  */
-const validateSavedLocationInput = datas => {
+const validateCampaignInput = datas => {
     const errors = {};
-    const expectedData = [ name, price, trafficRate, address, state, lga, country ];
-    datas.forEach(savedLocation => {
-        const key = arrayCompare(expectedData, Object.keys(savedLocation));
-        if(!key) {
-            errors.fields = `data must be complete`;
+    const expectedData = [ commercialId, duration, locationsSelected, status, title, validity ];
+    const key = arrayCompare(expectedData, Object.keys(datas));
+    if(!key) {
+        errors.fields = `data must be complete`;
+    }
+    for(const data in datas) {
+        if (_.isEmpty(data)) {
+            errors.fields = `${data} must not be empty`;
         }
-        for(const data in savedLocation) {
-            if (_.isEmpty(data)) {
-                errors.fields = `${data} must not be empty`;
-            }
-        }
-    });
+    }
     return { errors, valid: Object.keys(errors).length === 0 ? true : false };
 };
 
-module.exports = validateSavedLocationInput;
+module.exports = validateCampaignInput;
