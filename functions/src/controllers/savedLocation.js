@@ -2,7 +2,7 @@ const {
     CREATED, OK,
 } = require('http-status-codes');
 
-const { db } = require('../utils/firebase');
+const { db, fieldValue } = require('../utils/firebase');
 const validateSavedLocationInput = require('../validations/savedLocationInput');
 const { tryCatchError, validationError } = require('../utils/errorHandler');
 const { successNoData, successNoMessage } = require('../utils/successHandler');
@@ -14,7 +14,27 @@ const SavedLocations = {
 	 * @param {object} req - request object
 	 * @param {object} res - response object
 	 * @return  {Object} result
-	*/
+    */
+    async addLocations(req, res) {
+        try {
+            const { id } = req.params, { type } = req.query, { locations } = req.body;
+            if (type === 'add' || type === 'remove') {
+                const operationType = locationId => type === 'add' ?
+                    fieldValue.arrayUnion(locationId) : fieldValue.arrayRemove(locationId);
+                const docRef = db.collection('savedLocations').doc(id);
+                const locationOperation = locations.map(id => docRef.update({
+                    locations: operationType(id),
+                    updatedAt: new Date().toISOString(), updatedBy: req.user.uid,
+                }));
+                await Promise.all(locationOperation);
+                return successNoData(res, OK, 'Updated successfully');
+            }
+            return validationError(res, 'Pass in a query parameter');
+
+        } catch (error) {
+            tryCatchError(res, error);
+        }
+    },
     async create(req, res) {
         try {
             const { valid, errors } = await validateSavedLocationInput(req.body);
@@ -56,20 +76,23 @@ const SavedLocations = {
             tryCatchError(res, error);
         }
     },
+    // eslint-disable-next-line max-lines-per-function
     async getOne(req, res) {
         try {
             const documentData = await db.collection('savedLocations').doc(req.params.id).get();
             const savedLocations = documentData.data();
-            const { locations } = savedLocations;
+            savedLocations.savedLocationId = documentData.id;
             if (savedLocations.createdBy !== req.user.uid) {
                 return validationError(res, 'Not Authorized to view this');
             }
-            const retrievedLocations = locations.map(id => db.
-                collection('locations').doc(id).get());
-            const newLocations = await Promise.all(retrievedLocations);
-            savedLocations.locations = newLocations.map(doc => Object.assign({},
-                doc.data(),
-                { savedLocationId: doc.id }));
+            const { locations } = savedLocations;
+            if (locations.length !== 0) {
+                const retrievedLocations = locations.map(id => db.
+                    collection('locations').doc(id).get());
+                const newLocations = await Promise.all(retrievedLocations);
+                savedLocations.locations = newLocations.map(doc => Object.assign({},
+                    doc.data(), { locationId: doc.id }));
+            }
             return successNoMessage(res, OK, savedLocations);
         } catch (error) {
             tryCatchError(res, error);
@@ -90,6 +113,7 @@ const SavedLocations = {
             tryCatchError(res, error);
         }
     },
+
 };
 
 module.exports = SavedLocations;
