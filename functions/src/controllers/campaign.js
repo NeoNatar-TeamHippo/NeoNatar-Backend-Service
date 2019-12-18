@@ -56,8 +56,8 @@ const Campaign = {
             const docs = data.docs;
             for (const doc of docs) {
                 const selectedItem = {
-                    id: doc.id,
                     campaign: doc.data(),
+                    id: doc.id,
                 };
                 campaigns.push(selectedItem);
             }
@@ -75,7 +75,7 @@ const Campaign = {
             }
             const documentData = await document.get();
             const campaign = documentData.data();
-            if(campaign.createdBy !== req.user.uid) {
+            if (campaign.createdBy !== req.user.uid) {
                 return validationError(res, 'Not Authorized');
             }
             return successNoMessage(res, OK, campaign);

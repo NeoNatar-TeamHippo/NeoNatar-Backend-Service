@@ -17,10 +17,9 @@ const SavedLocations = {
 	*/
     async create(req, res) {
         try {
-            const { valid, errors } = await validateSavedLocationInput(req.body.location);
+            const { valid, errors } = await validateSavedLocationInput(req.body);
             if (!valid) validationError(res, errors);
-            const createdAt = new Date().toISOString();
-            req.body.createdAt = createdAt;
+            req.body.createdAt = new Date().toISOString();
             req.body.createdBy = req.user.uid;
             if (valid) {
                 await db.collection('savedLocations').doc().create(req.body);
@@ -46,35 +45,31 @@ const SavedLocations = {
 
     async getAll(req, res) {
         try {
-            const savedLocations = [];
             const { uid } = req.user;
-            const data = await db.collection('savedLocations').where('createdBy', '==', uid )
+            const data = await db.collection('savedLocations').where('createdBy', '==', uid)
                 .orderBy('createdAt', 'desc').get();
-            const docs = data.docs;
-            for (const doc of docs) {
-                const selectedItem = {
-                    id: doc.id,
-                    savedLocation: doc.data(),
-                };
-                savedLocations.push(selectedItem);
-            }
+            const { docs } = data;
+            const savedLocations = docs.
+                map(doc => Object.assign({}, doc.data(), { savedLocationId: doc.id }));
             return successNoMessage(res, OK, savedLocations);
         } catch (error) {
             tryCatchError(res, error);
         }
     },
-
     async getOne(req, res) {
         try {
-            const document = db.collection('savedLocations').doc(req.params.id);
-            if (!document) {
-                return validationError(res, 'Document not found');
-            }
-            const documentData = await document.get();
+            const documentData = await db.collection('savedLocations').doc(req.params.id).get();
             const savedLocations = documentData.data();
-            if(savedLocations.createdBy !== req.user.uid) {
-                return validationError(res, 'Not Authorized');
+            const { locations } = savedLocations;
+            if (savedLocations.createdBy !== req.user.uid) {
+                return validationError(res, 'Not Authorized to view this');
             }
+            const retrievedLocations = locations.map(id => db.
+                collection('locations').doc(id).get());
+            const newLocations = await Promise.all(retrievedLocations);
+            savedLocations.locations = newLocations.map(doc => Object.assign({},
+                doc.data(),
+                { savedLocationId: doc.id }));
             return successNoMessage(res, OK, savedLocations);
         } catch (error) {
             tryCatchError(res, error);
@@ -89,10 +84,8 @@ const SavedLocations = {
             if (!valid) validationError(res, errors);
             req.body.updatedAt = new Date().toISOString();
             req.body.updatedBy = req.user.uid;
-            if (valid) {
-                await document.update(req.body);
-                return successNoData(res, CREATED, 'saved Location successfully updated');
-            }
+            await document.update(req.body);
+            return successNoData(res, CREATED, 'saved Location successfully updated');
         } catch (error) {
             tryCatchError(res, error);
         }

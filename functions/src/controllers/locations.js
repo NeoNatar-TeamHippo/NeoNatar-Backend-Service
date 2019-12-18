@@ -55,11 +55,8 @@ const Locations = {
             const data = await db.collection('locations').get();
             const docs = data.docs;
             for (const doc of docs) {
-                const selectedItem = {
-                    id: doc.id,
-                    location: doc.data(),
-                };
-                locations.push(selectedItem);
+                const newObj = Object.assign({}, doc.data(), { locationId: doc.id });
+                locations.push(newObj);
             }
             return successNoMessage(res, OK, locations);
         } catch (error) {

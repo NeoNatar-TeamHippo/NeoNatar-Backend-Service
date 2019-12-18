@@ -1,38 +1,16 @@
 const _ = require('lodash');
-const { input } = require('../config/constant');
-const { name, price, trafficRate, address, state, lga, country } = input;
-/**
- * An helper function to sort and compare data in an array
- * @function
- * @param [array] expected data - expected data array
- * @param [array] input data - input data array
- * @return  boolean result
- */
-const arrayCompare = (expectedData, inputData) => {
-    const stringExpectedData = expectedData.sort();
-    const stringInputData = inputData.sort();
-    return JSON.stringify(stringExpectedData) === JSON.stringify(stringInputData);
-};
+
 /**
  * An helper function to validate saved Location input
  * @function
- * @param [array] datas - data to validata
+ * @param  data to validate
  * @return  {object} result
  */
-const validateSavedLocationInput = datas => {
+const validateSavedLocationInput = data => {
     const errors = {};
-    const expectedData = [ name, price, trafficRate, address, state, lga, country ];
-    datas.forEach(savedLocation => {
-        const key = arrayCompare(expectedData, Object.keys(savedLocation));
-        if(!key) {
-            errors.fields = `data must be complete`;
-        }
-        for(const data in savedLocation) {
-            if (_.isEmpty(data)) {
-                errors.fields = `${data} must not be empty`;
-            }
-        }
-    });
+    if (_.isEmpty(data.title) || _.isEmpty(data.description) || _.isEmpty(data.locations)) {
+        errors.fields = 'Fields must not be empty';
+    }
     return { errors, valid: Object.keys(errors).length === 0 ? true : false };
 };
 
