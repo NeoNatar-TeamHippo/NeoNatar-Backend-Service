@@ -8,6 +8,7 @@ router.post('/', FBauth, savedLocationController.create);
 router.get('/', FBauth, savedLocationController.getAll);
 router.get('/:id', FBauth, savedLocationController.getOne);
 router.put('/:id', FBauth, savedLocationController.updateSavedLocation);
+router.patch('/:id', FBauth, savedLocationController.addLocations);
 router.delete('/:id', FBauth, savedLocationController.deleteSavedLocation);
 
 module.exports = router;
