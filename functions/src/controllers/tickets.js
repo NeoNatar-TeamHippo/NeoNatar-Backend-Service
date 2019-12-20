@@ -85,16 +85,17 @@ class ticketController {
         try {
             const { userId, isAdmin } = req.user;
             let data;
-            if (isAdmin) {
-                data = await db.collection('tickets').orderBy('createdAt', 'desc').get();
-            }
-            else {
-                data = await db.collection('tickets').where('createdBy', '==', userId)
-                    .orderBy('createdAt', 'desc').get();
-            }
-            const docs = data.docs;
-            const tickets = docs.map(doc => ({ id: doc.id, ticket: doc.data() }));
-            return successNoMessage(res, OK, tickets);
+            if (isAdmin) data = await db.collection('tickets').orderBy('createdAt', 'desc').get();
+            else data = await db.collection('tickets').where('createdBy', '==', userId)
+                .orderBy('createdAt', 'desc').get();
+            const { docs } = data;
+            const retrievedUsers = docs.map(async doc => {
+                const userData = await db.collection('users')
+                    .where('userId', '==', doc.data().createdBy).get();
+                return { id: doc.id, ticket: doc.data(), user: userData.docs[0].data() };
+            });
+            const ticketsAndUsers = await Promise.all(retrievedUsers);
+            return successNoMessage(res, OK, ticketsAndUsers);
         } catch (error) {
             return tryCatchError(res, error);
         }
