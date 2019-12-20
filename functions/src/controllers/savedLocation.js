@@ -5,7 +5,7 @@ const {
 const { db, fieldValue } = require('../utils/firebase');
 const validateSavedLocationInput = require('../validations/savedLocationInput');
 const { tryCatchError, validationError } = require('../utils/errorHandler');
-const { successNoData, successNoMessage } = require('../utils/successHandler');
+const { successNoData, successNoMessage, successWithData } = require('../utils/successHandler');
 
 const SavedLocations = {
     /**
@@ -42,8 +42,10 @@ const SavedLocations = {
             req.body.createdAt = new Date().toISOString();
             req.body.createdBy = req.user.uid;
             if (valid) {
-                await db.collection('savedLocations').doc().create(req.body);
-                return successNoData(res, CREATED, 'Saved Locations successfully created');
+                const doc = await db.collection('savedLocations').add(req.body);
+                const docData = await db.collection('savedLocations').doc(doc.id).get();
+                const data = Object.assign({}, docData.data(), { savedLocationId: doc.id });
+                return successNoMessage(res, CREATED, data);
             }
         } catch (error) {
             return tryCatchError(res, error);
