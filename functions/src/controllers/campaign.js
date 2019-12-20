@@ -26,8 +26,8 @@ const Campaign = {
             const docs = data.docs;
             for (const doc of docs) {
                 const selectedItem = {
-                    id: doc.id,
                     campaign: doc.data(),
+                    id: doc.id,
                 };
                 campaigns.push(selectedItem);
             }

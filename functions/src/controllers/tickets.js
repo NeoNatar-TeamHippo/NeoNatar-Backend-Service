@@ -79,7 +79,7 @@ class ticketController {
         }
     }
     /**
-   * Get all new tickets created by the particular user
+   * Get tickets by status created by the particular user
    * @function
    * @param {object} req - request object
    * @param {object} res - response object
