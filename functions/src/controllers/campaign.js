@@ -56,7 +56,7 @@ const Campaign = {
             const document = db.collection('campaigns').doc(req.params.id);
             if (!document) validationError(res, errors);
             req.body.status = approved;
-            req.body.staus = live;
+            req.body.validity = live;
             req.body.approvedAt = new Date().toISOString();
             if (valid) {
                 await document.update(req.body);
