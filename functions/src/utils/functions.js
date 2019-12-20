@@ -51,6 +51,27 @@ const createTicketData = (title, priority, userId) => ({
     title,
 });
 /**
+    * returns a ticket created
+    * @function
+    * @param {String} title - ticket's title
+    * @param {String} priority - ticket's priority
+    * @param {String} userId - user's id
+    * @return  {Object} ticket's object
+    */
+const createTicketResponseData = (doc, userData) => {
+    const { status, createdAt, title, priority } = doc.data();
+    const { avatar, firstName, lastName } = userData.docs[0].data();
+    return ({
+        avatar: avatar,
+        customerName: `${firstName} ${lastName}`,
+        date: (new Date(createdAt)).toDateString(),
+        priority: priority,
+        status: status,
+        ticketId: doc.id,
+        title: title,
+    });
+};
+/**
     * returns a message object created
     * @function
     * @param {String} body - message body
@@ -147,6 +168,7 @@ const getMultipleFirebaseLink = async (images, token) => {
 module.exports = {
     createMessageData,
     createTicketData,
+    createTicketResponseData,
     createUserData,
     getFirebaseLink,
     getLocationsAmount,
