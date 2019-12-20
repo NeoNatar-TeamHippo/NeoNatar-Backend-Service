@@ -132,7 +132,7 @@ const getLocationdata = async location => {
 const getLocationsAmount = async locationarray => {
     const price = [];
     locationarray.forEach(location => {
-        price.push(getLocationdata(location));
+        price.push(Number(getLocationdata(location)));
     });
     return await Promise.all(price);
 };
@@ -149,7 +149,10 @@ module.exports = {
     createTicketData,
     createUserData,
     getFirebaseLink,
+    getLocationsAmount,
+    getMultipleFirebaseLink,
     superAdmin,
     updateVideo,
+    uploadMultipleImages,
     uploadRequest,
 };

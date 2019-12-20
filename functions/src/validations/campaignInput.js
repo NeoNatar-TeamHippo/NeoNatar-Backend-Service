@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const { input } = require('../config/constant');
-const { commercialId,duration, locationsSelected, status, title, validity } = input;
+const { category, commercialId, duration, locationsSelected, title } = input;
 /**
  * An helper function to sort and compare data in an array
  * @function
@@ -21,7 +21,11 @@ const arrayCompare = (expectedData, inputData) => {
  */
 const validateCampaignInput = datas => {
     const errors = {};
-    const expectedData = [ commercialId, duration, locationsSelected, status, title, validity ];
+    const expectedData = [ category, 
+        commercialId, 
+        duration, 
+        locationsSelected, 
+        title ];
     const key = arrayCompare(expectedData, Object.keys(datas));
     if(!key) {
         errors.fields = `data must be complete`;
