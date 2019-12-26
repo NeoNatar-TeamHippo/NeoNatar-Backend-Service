@@ -67,13 +67,11 @@ class ticketController {
         try {
             const { id } = req.params;
             const doc = await db.collection('tickets').doc(id).get();
-            const ticket = doc.data();
-            const complainantId = ticket.createdBy;
+            const complainantId = doc.data().createdBy;
             const data = await db.collection('users')
                 .where('userId', '==', complainantId).get();
-            const user = data.docs[0].data();
-            const ticketData = { ticket, user };
-            return successNoMessage(res, OK, ticketData);
+            const ticketResponseData = createTicketResponseData(doc, data);
+            return successNoMessage(res, OK, ticketResponseData);
         } catch (error) {
             return tryCatchError(res, error);
         }

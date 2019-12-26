@@ -61,11 +61,11 @@ const createTicketData = (title, priority, userId) => ({
 const createCommercialResponseData = doc => {
     const { url, title, description, duration } = doc.data();
     return ({
-        description: description,
-        duration: duration,
+        description,
+        duration,
         id: doc.id,
-        title: title,
-        url: url,
+        title,
+        url,
     });
 };
 /**
@@ -80,13 +80,13 @@ const createTicketResponseData = (doc, userData) => {
     const { status, createdAt, title, priority } = doc.data();
     const { avatar, firstName, lastName } = userData.docs[0].data();
     return ({
-        avatar: avatar,
+        avatar,
         customerName: `${firstName} ${lastName}`,
         date: (new Date(createdAt)).toDateString(),
-        priority: priority,
-        status: status,
+        priority,
+        status,
         ticketId: doc.id,
-        title: title,
+        title,
     });
 };
 /**
