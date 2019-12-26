@@ -6,6 +6,9 @@ const { validationError, tryCatchError } = require('../utils/errorHandler');
 const { successNoData, successWithData, successNoMessage } = require('../utils/successHandler');
 const { updateVideo } = require('../utils/functions');
 const { validateDetails } = require('../validations/commercial');
+const {
+    createCommercialResponseData,
+} = require('../utils/functions');
 class commercialController {
     /**
 	 * Creates uploads a new video commercial
@@ -48,14 +51,10 @@ class commercialController {
             const data = await db.collection('commercials').where('createdBy', '==', userId)
                 .orderBy('createdAt', 'desc').get();
             const docs = data.docs;
-            const commercials = [];
-            for (const doc of docs) {
-                const obj = {
-                    commercial: doc.data(),
-                    id: doc.id,
-                };
-                commercials.push(obj);
-            }
+            const commercialData = docs.map(async doc => {
+                const commercialResponseData = createCommercialResponseData(doc);
+                return commercialResponseData;
+            }); const commercials = await Promise.all(commercialData);
             return successNoMessage(res, OK, commercials);
         } catch (error) {
             return tryCatchError(res, error);
