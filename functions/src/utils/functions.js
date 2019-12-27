@@ -1,5 +1,6 @@
 const { getVideoDurationInSeconds } = require('get-video-duration');
 const { firebaseConfig } = require('../config/index');
+const { content1, content2 } = require('../config/constant');
 const { db, admin } = require('../utils/firebase');
 const { deleteUpload, uploads } = require('../utils/cloudinaryConfig');
 const url = `https://firebasestorage.googleapis.com/v0/b/${firebaseConfig.storageBucket}`;
@@ -49,8 +50,7 @@ const createTicketData = (title, priority, userId) => ({
         {
             author: 'Neonatar Admin',
             avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
-            content: `Welcome to NeoNatar, please tell you about your issue. 
-            We will get back to you ass soon as possible`,
+            content: `${content1} ${content2}`,
             createdAt: new Date().toISOString(),
             isAdmin: true,
         },
