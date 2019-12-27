@@ -49,7 +49,8 @@ const createTicketData = (title, priority, userId) => ({
         {
             author: 'Neonatar Admin',
             avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
-            content: 'Welcome to NeoNatar, please tell you about your issue. We will get back to you ass soon as possible',
+            content: `Welcome to NeoNatar, please tell you about your issue. 
+            We will get back to you ass soon as possible`,
             createdAt: new Date().toISOString(),
             isAdmin: true,
         },
