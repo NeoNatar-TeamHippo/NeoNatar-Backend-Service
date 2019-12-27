@@ -1,7 +1,9 @@
 module.exports.input = {
     address: 'address',
+    adminImage: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
     amount: 'amount',
     approved: 'approved',
+    author: 'Neonatar Admin',
     category: 'category',
     commercialId: 'commercialId',
     content1: 'Welcome to NeoNatar, please tell you about your issue. We will get back to you as',

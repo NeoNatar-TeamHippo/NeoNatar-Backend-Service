@@ -1,6 +1,6 @@
 const { getVideoDurationInSeconds } = require('get-video-duration');
 const { firebaseConfig } = require('../config/index');
-const { content1, content2 } = require('../config/constant');
+const { adminImage, author, content1, content2 } = require('../config/constant');
 const { db, admin } = require('../utils/firebase');
 const { deleteUpload, uploads } = require('../utils/cloudinaryConfig');
 const url = `https://firebasestorage.googleapis.com/v0/b/${firebaseConfig.storageBucket}`;
@@ -48,8 +48,8 @@ const createTicketData = (title, priority, userId) => ({
     createdBy: userId,
     messages: [
         {
-            author: 'Neonatar Admin',
-            avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+            author,
+            avatar: adminImage,
             content: `${content1} ${content2}`,
             createdAt: new Date().toISOString(),
             isAdmin: true,
@@ -112,7 +112,7 @@ const createMessageData = (body, isAdmin, userData) => {
     if(isAdmin) {
         return ({
             author: 'Neonatar Admin',
-            avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+            avatar: ,
             content: body,
             createdAt: new Date().toISOString(),
             isAdmin,
