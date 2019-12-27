@@ -44,14 +44,14 @@ class ticketController {
             let status = 'new';
             const { valid, errors } = validateMessageData(req.body);
             if (!valid) return validationError(res, errors);
-            const messageData = createMessageData(body, isAdmin, userId);
+            const data = await db.collection('users').where('userId', '==', userId).get();
+            const messageData = createMessageData(body, isAdmin, data);
             const docRef = db.collection('tickets').doc(id);
             if (isAdmin) status = 'pending';
             await docRef.update({
                 messages: fieldValue.arrayUnion(messageData),
                 status,
-            });
-            return successNoData(res, OK, 'Message added');
+            }); return successNoData(res, OK, 'Message added');
         } catch (error) {
             return tryCatchError(res, error);
         }

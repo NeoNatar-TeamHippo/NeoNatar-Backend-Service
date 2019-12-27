@@ -45,6 +45,15 @@ const createUserData = (avatar, email, firstName, lastName, userId, isAdmin) => 
 const createTicketData = (title, priority, userId) => ({
     createdAt: new Date().toISOString(),
     createdBy: userId,
+    messages: [
+        {
+            author: 'Neonatar Admin',
+            avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+            content: 'Welcome to NeoNatar, please tell you about your issue. We will get back to you ass soon as possible',
+            createdAt: new Date().toISOString(),
+            isAdmin: true,
+        },
+    ],
     priority,
     resolvedBy: '',
     status: 'new',
@@ -77,12 +86,13 @@ const createCommercialResponseData = doc => {
     * @return  {Object} ticket's object
     */
 const createTicketResponseData = (doc, userData) => {
-    const { status, createdAt, title, priority } = doc.data();
+    const { status, createdAt, title, priority, messages } = doc.data();
     const { avatar, firstName, lastName } = userData.docs[0].data();
     return ({
         avatar,
         customerName: `${firstName} ${lastName}`,
         date: (new Date(createdAt)).toDateString(),
+        messages,
         priority,
         status,
         ticketId: doc.id,
@@ -97,12 +107,26 @@ const createTicketResponseData = (doc, userData) => {
     * @param {String} userId - user's id
     * @return  {Object} message's object
     */
-const createMessageData = (body, isAdmin, userId) => ({
-    body,
-    createdAt: new Date().toISOString(),
-    createdBy: userId,
-    isAdmin,
-});
+const createMessageData = (body, isAdmin, userData) => {
+    if(isAdmin) {
+        return ({
+            author: 'Neonatar Admin',
+            avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+            content: body,
+            createdAt: new Date().toISOString(),
+            isAdmin,
+        });
+    }
+    if(!isAdmin) {
+        const { avatar, firstName, lastName } = userData.docs[0].data();
+        return ({
+            author: `${firstName} ${lastName}`,
+            avatar,
+            content: body,
+            createdAt: new Date().toISOString(),isAdmin,
+        });
+    }
+};
 /**
     * returns a a boolean to check if a user is a super admin or not
     * @function
