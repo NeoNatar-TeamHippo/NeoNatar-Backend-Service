@@ -23,6 +23,7 @@ class ticketController {
             const { valid, errors } = validateTicketData(req.body);
             if (!valid) return validationError(res, errors);
             const ticketData = createTicketData(title, priority, userId);
+            console.log(ticketData);
             await db.collection('tickets').add(ticketData);
             return successNoData(res, CREATED, `New ticket created`);
         } catch (error) {

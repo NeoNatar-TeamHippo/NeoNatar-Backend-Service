@@ -1,8 +1,9 @@
 const { getVideoDurationInSeconds } = require('get-video-duration');
 const { firebaseConfig } = require('../config/index');
-const { adminImage, author, content1, content2 } = require('../config/constant');
+const { input } = require('../config/constant');
 const { db, admin } = require('../utils/firebase');
 const { deleteUpload, uploads } = require('../utils/cloudinaryConfig');
+const { adminImage, author, content1, content2 } = input;
 const url = `https://firebasestorage.googleapis.com/v0/b/${firebaseConfig.storageBucket}`;
 const amt = 'alt=media&token=';
 /**
@@ -48,7 +49,7 @@ const createTicketData = (title, priority, userId) => ({
     createdBy: userId,
     messages: [
         {
-            author,
+            author: author,
             avatar: adminImage,
             content: `${content1} ${content2}`,
             createdAt: new Date().toISOString(),
@@ -112,7 +113,7 @@ const createMessageData = (body, isAdmin, userData) => {
     if(isAdmin) {
         return ({
             author: 'Neonatar Admin',
-            avatar: ,
+            avatar,
             content: body,
             createdAt: new Date().toISOString(),
             isAdmin,
