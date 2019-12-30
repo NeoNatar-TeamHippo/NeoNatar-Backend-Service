@@ -18,7 +18,7 @@ const Campaign = {
 	 * @param {object} res - response object
 	 * @return  {Object} result
     */
-   
+
     async adminGetAll(req, res) {
         try {
             const campaigns = [];
@@ -26,8 +26,8 @@ const Campaign = {
             const docs = data.docs;
             for (const doc of docs) {
                 const selectedItem = {
-                    id: doc.id,
                     campaign: doc.data(),
+                    id: doc.id,
                 };
                 campaigns.push(selectedItem);
             }

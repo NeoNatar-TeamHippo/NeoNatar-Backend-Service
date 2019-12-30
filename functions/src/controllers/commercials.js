@@ -50,11 +50,8 @@ class commercialController {
             const docs = data.docs;
             const commercials = [];
             for (const doc of docs) {
-                const obj = {
-                    commercial: doc.data(),
-                    id: doc.id,
-                };
-                commercials.push(obj);
+                const newObj = Object.assign({}, doc.data(), { commercialId: doc.id });
+                commercials.push(newObj);
             }
             return successNoMessage(res, OK, commercials);
         } catch (error) {
