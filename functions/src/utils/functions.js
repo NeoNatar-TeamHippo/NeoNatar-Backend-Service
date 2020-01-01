@@ -1,7 +1,9 @@
 const { getVideoDurationInSeconds } = require('get-video-duration');
 const { firebaseConfig } = require('../config/index');
+const { input } = require('../config/constant');
 const { db, admin } = require('../utils/firebase');
 const { deleteUpload, uploads } = require('../utils/cloudinaryConfig');
+const { adminImage, author, content1, content2 } = input;
 const url = `https://firebasestorage.googleapis.com/v0/b/${firebaseConfig.storageBucket}`;
 const amt = 'alt=media&token=';
 /**
@@ -42,14 +44,26 @@ const createUserData = (avatar, email, firstName, lastName, userId, isAdmin) => 
     * @param {String} userId - user's id
     * @return  {Object} ticket's object
     */
-const createTicketData = (title, priority, userId) => ({
-    createdAt: new Date().toISOString(),
-    createdBy: userId,
-    priority,
-    resolvedBy: '',
-    status: 'new',
-    title,
-});
+const createTicketData = (title, priority, userId, userData) => {
+    const { avatar, firstName, lastName } = userData.docs[0].data();
+    return({
+        avatar,
+        createdAt: new Date().toISOString(),
+        createdBy: userId,
+        customerName: `${firstName} ${lastName}`,
+        messages: [
+            {
+                author: author,
+                avatar: adminImage,
+                content: `${content1} ${content2}`,
+                createdAt: new Date().toISOString(),
+                isAdmin: true,
+            },
+        ], priority,
+        resolvedBy: '',
+        status: 'new', title,
+    });
+};
 /**
     * returns a ticket created
     * @function
@@ -77,12 +91,13 @@ const createCommercialResponseData = doc => {
     * @return  {Object} ticket's object
     */
 const createTicketResponseData = (doc, userData) => {
-    const { status, createdAt, title, priority } = doc.data();
+    const { status, createdAt, title, priority, messages } = doc.data();
     const { avatar, firstName, lastName } = userData.docs[0].data();
     return ({
         avatar,
         customerName: `${firstName} ${lastName}`,
         date: (new Date(createdAt)).toDateString(),
+        messages,
         priority,
         status,
         ticketId: doc.id,
@@ -97,12 +112,26 @@ const createTicketResponseData = (doc, userData) => {
     * @param {String} userId - user's id
     * @return  {Object} message's object
     */
-const createMessageData = (body, isAdmin, userId) => ({
-    body,
-    createdAt: new Date().toISOString(),
-    createdBy: userId,
-    isAdmin,
-});
+const createMessageData = (body, isAdmin, userData) => {
+    if(isAdmin) {
+        return ({
+            author: 'Neonatar Admin',
+            avatar: adminImage,
+            content: body,
+            createdAt: new Date().toISOString(),
+            isAdmin,
+        });
+    }
+    if(!isAdmin) {
+        const { avatar, firstName, lastName } = userData.docs[0].data();
+        return ({
+            author: `${firstName} ${lastName}`,
+            avatar,
+            content: body,
+            createdAt: new Date().toISOString(),isAdmin,
+        });
+    }
+};
 /**
     * returns a a boolean to check if a user is a super admin or not
     * @function
