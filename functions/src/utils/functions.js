@@ -44,23 +44,26 @@ const createUserData = (avatar, email, firstName, lastName, userId, isAdmin) => 
     * @param {String} userId - user's id
     * @return  {Object} ticket's object
     */
-const createTicketData = (title, priority, userId) => ({
-    createdAt: new Date().toISOString(),
-    createdBy: userId,
-    messages: [
-        {
-            author: author,
-            avatar: adminImage,
-            content: `${content1} ${content2}`,
-            createdAt: new Date().toISOString(),
-            isAdmin: true,
-        },
-    ],
-    priority,
-    resolvedBy: '',
-    status: 'new',
-    title,
-});
+const createTicketData = (title, priority, userId, userData) => {
+    const { avatar, firstName, lastName } = userData.docs[0].data();
+    return({
+        avatar,
+        createdAt: new Date().toISOString(),
+        createdBy: userId,
+        customerName: `${firstName} ${lastName}`,
+        messages: [
+            {
+                author: author,
+                avatar: adminImage,
+                content: `${content1} ${content2}`,
+                createdAt: new Date().toISOString(),
+                isAdmin: true,
+            },
+        ], priority,
+        resolvedBy: '',
+        status: 'new', title,
+    });
+};
 /**
     * returns a ticket created
     * @function
@@ -113,7 +116,7 @@ const createMessageData = (body, isAdmin, userData) => {
     if(isAdmin) {
         return ({
             author: 'Neonatar Admin',
-            avatar,
+            avatar: adminImage,
             content: body,
             createdAt: new Date().toISOString(),
             isAdmin,
