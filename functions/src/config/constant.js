@@ -6,7 +6,7 @@ module.exports.input = {
     author: 'Neonatar Admin',
     category: 'category',
     commercialId: 'commercialId',
-    content1: 'Welcome to NeoNatar, please tell you about your issue. We will get back to you as',
+    content1: 'Welcome to NeoNatar, please tell us about your issue. We will get back to you as',
     content2: 'soon as possible',
     country: 'country',
     duration: 'duration',
