@@ -105,6 +105,33 @@ const createTicketResponseData = (doc, userData) => {
     });
 };
 /**
+    * returns a ticket created
+    * @function
+    * @param {String} title - ticket's title
+    * @param {String} priority - ticket's priority
+    * @param {String} userId - user's id
+    * @return  {Object} ticket's object
+    */
+const camapignResponseData = (doc, userData) => {
+    const { status, 
+        createdAt, createdBy, numberOfLocations, 
+        title, amount, locationsSelected, duration, commerercialId } = doc.data();
+    const { firstName, lastName } = userData.docs[0].data();
+    return ({
+        amount,
+        camapaignId: doc.id,
+        commerercialId,
+        createdAt,
+        createdBy,
+        customerName: `${firstName} ${lastName}`,
+        duration,
+        locationsSelected,
+        numberOfLocations,
+        status,
+        title,
+    });
+};
+/**
     * returns a message object created
     * @function
     * @param {String} body - message body
@@ -200,7 +227,7 @@ const getLocationdata = async location => {
 const getLocationsAmount = async locationarray => {
     const price = [];
     locationarray.forEach(location => {
-        price.push(Number(getLocationdata(location)));
+        price.push(getLocationdata(location));
     });
     return await Promise.all(price);
 };
@@ -213,6 +240,7 @@ const getMultipleFirebaseLink = async (images, token) => {
     return await Promise.all(promises);
 }; 
 module.exports = {
+    camapignResponseData,
     createCommercialResponseData,
     createMessageData,
     createTicketData,
