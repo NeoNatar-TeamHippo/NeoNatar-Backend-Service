@@ -132,6 +132,28 @@ const camapignResponseData = (doc, userData) => {
     });
 };
 /**
+    * returns a ticket created
+    * @function
+    * @param {String} title - ticket's title
+    * @param {String} priority - ticket's priority
+    * @param {String} userId - user's id
+    * @return  {Object} ticket's object
+    */
+const transactionResponseData = doc => {
+    const { status, 
+        createdAt, createdBy, amount, 
+        title, campaignId } = doc.data();
+    return ({
+        amount,
+        campaignId,
+        createdAt,
+        createdBy,
+        status,
+        title,
+        transactionId: doc.id,
+    });
+};
+/**
     * returns a message object created
     * @function
     * @param {String} body - message body
@@ -250,6 +272,7 @@ module.exports = {
     getLocationsAmount,
     getMultipleFirebaseLink,
     superAdmin,
+    transactionResponseData,
     updateVideo,
     uploadMultipleImages,
     uploadRequest,
