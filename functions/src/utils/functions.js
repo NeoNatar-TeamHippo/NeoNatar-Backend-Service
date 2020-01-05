@@ -119,7 +119,7 @@ const camapignResponseData = (doc, userData) => {
     const { firstName, lastName } = userData.docs[0].data();
     return ({
         amount,
-        camapaignId: doc.id,
+        campaignId: doc.id,
         commerercialId,
         createdAt,
         createdBy,
