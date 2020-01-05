@@ -112,15 +112,34 @@ const createTicketResponseData = (doc, userData) => {
     * @param {String} userId - user's id
     * @return  {Object} ticket's object
     */
-const camapignResponseData = (doc, userData) => {
+// eslint-disable-next-line max-lines-per-function
+const camapignResponseData = async (doc, userData) => {
     const { status, 
         createdAt, createdBy, numberOfLocations, 
-        title, amount, locationsSelected, duration, commerercialId } = doc.data();
+        title, amount, locationsSelected, duration, commercialId } = doc.data();
+    console.log(commercialId);
+    const commercialDoc = await db.collection('commercials').doc(commercialId).get();
+    const getLocationdata = async location => {
+        const amount = await db.collection('locations').doc(location);
+        const documentData = await amount.get();
+        const data = documentData.data().name;
+        console.log(data);
+        return data;
+    };
+    const getLocationsName = async locations => {
+        const name = [];
+        locations.forEach(location => {
+            name.push(getLocationdata(location));
+        });
+        return await Promise.all(name);
+    };
+    const test = getLocationsName(locationsSelected);
+    console.log(test);
     const { firstName, lastName } = userData.docs[0].data();
     return ({
         amount,
         campaignId: doc.id,
-        commerercialId,
+        commerercialUrl: commercialDoc.data().url,
         createdAt,
         createdBy,
         customerName: `${firstName} ${lastName}`,
