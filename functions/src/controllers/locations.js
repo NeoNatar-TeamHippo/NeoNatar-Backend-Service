@@ -20,18 +20,19 @@ const Locations = {
     async create(req, res) {
         try {
             const { valid, errors } = await validateLocationInput(req.body);
-            if (!valid) validationError(res, errors);
-            req.body.createdAt = new Date().toISOString();
-            req.body.createdBy = req.user.uid;
+            if (!valid) return validationError(res, errors);
             const { userId } = req.user;
             const token = uuidv5(`${userId}`, uuidv5.URL);
+            req.body.createdAt = new Date().toISOString();
+            req.body.createdBy = req.user.uid;
             await uploadMultipleImages(req.files, token);
             req.body.images = await getMultipleFirebaseLink(req.files, token);
-            if (valid) {
-                await db.collection('locations').doc().create(req.body);
-                return successNoData(res, CREATED, 'Location successfully created');
-            }
+            const doc = await db.collection('locations').add(req.body);
+            const docData = await db.collection('locations').doc(doc.id).get();
+            const data = Object.assign({}, docData.data(), { locationId: doc.id });
+            return successNoMessage(res, CREATED, data);
         } catch (error) {
+            console.log(error);
             return tryCatchError(res, error);
         }
     },

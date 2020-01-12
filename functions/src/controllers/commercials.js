@@ -51,10 +51,11 @@ class commercialController {
             const data = await db.collection('commercials').where('createdBy', '==', userId)
                 .orderBy('createdAt', 'desc').get();
             const docs = data.docs;
-            const commercialData = docs.map(async doc => {
-                const commercialResponseData = createCommercialResponseData(doc);
-                return commercialResponseData;
-            }); const commercials = await Promise.all(commercialData);
+            const commercials = [];
+            for (const doc of docs) {
+                const newObj = Object.assign({}, doc.data(), { commercialId: doc.id });
+                commercials.push(newObj);
+            }
             return successNoMessage(res, OK, commercials);
         } catch (error) {
             return tryCatchError(res, error);

@@ -3,7 +3,7 @@ const { db, fieldValue } = require('../utils/firebase');
 const { validationError, tryCatchError } = require('../utils/errorHandler');
 const { successNoData, successWithData, successNoMessage } = require('../utils/successHandler');
 const { validateTicketData, validateMessageData } = require('../validations/ticket');
-const { createTransactionData } = require('../utils/functions');
+const { createTransactionData, transactionResponseData } = require('../utils/functions');
 class transactionController {
     /**
 	 * Creates a new transaction, after creating a campaign
@@ -72,7 +72,7 @@ class transactionController {
                     .orderBy('createdAt', 'desc').get();
             }
             const docs = data.docs;
-            const transactions = docs.map(doc => ({ id: doc.id, transaction: doc.data() }));
+            const transactions = docs.map(doc => transactionResponseData(doc));
             return successNoMessage(res, OK, transactions);
         } catch (error) {
             return tryCatchError(res, error);
