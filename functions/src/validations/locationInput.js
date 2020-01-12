@@ -2,7 +2,7 @@ const _ = require('lodash');
 
 const validateLocationInput = datas => {
     const errors = {};
-    if (Object.keys(datas).length !== 7) {
+    if (Object.keys(datas).length <= 7) {
         errors.fields = `data must be complete`;
     }
     for (const data in datas) {
