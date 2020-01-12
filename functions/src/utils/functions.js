@@ -115,6 +115,23 @@ const createCommercialResponseData = doc => {
     * @param {String} userId - user's id
     * @return  {Object} ticket's object
     */
+const commercialData = (userId, description, duration, title, url, id) => ({
+    createdAt: new Date().toISOString(), 
+    createdBy: userId,
+    description,
+    duration: Math.round(duration),
+    title,
+    url, 
+    videoId: id,
+});
+/**
+    * returns a ticket created
+    * @function
+    * @param {String} title - ticket's title
+    * @param {String} priority - ticket's priority
+    * @param {String} userId - user's id
+    * @return  {Object} ticket's object
+    */
 const createTicketResponseData = (doc, userData) => {
     const { status, createdAt, title, priority, messages } = doc.data();
     const { avatar, firstName, lastName } = userData.docs[0].data();
@@ -321,6 +338,7 @@ const getMultipleFirebaseLink = async (images, token) => {
 module.exports = {
     campaignResponseData,
     createCampaignData,
+    commercialData,
     createCommercialResponseData,
     createMessageData,
     createTicketData,
