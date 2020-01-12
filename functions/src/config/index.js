@@ -36,14 +36,4 @@ module.exports = {
         pass: process.env.PASS,
         user: process.env.USER,
     },
-    savedLocationInput: {
-        address: 'address',
-        country: 'country',
-        lga: 'lga',
-        name: 'name',
-        price: 'price',
-        state: 'state',
-        trafficRate: 'trafficRate',
-    },
-
 };

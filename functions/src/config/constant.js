@@ -4,7 +4,6 @@ module.exports.input = {
     amount: 'amount',
     approved: 'approved',
     author: 'Neonatar Admin',
-    category: 'category',
     commercialId: 'commercialId',
     content1: 'Welcome to NeoNatar, please tell us about your issue. We will get back to you as',
     content2: 'soon as possible',

@@ -72,6 +72,31 @@ const createTicketData = (title, priority, userId, userData) => {
     * @param {String} userId - user's id
     * @return  {Object} ticket's object
     */
+const createCampaignData = async (body, userId) => {
+    const { commercialId, locationsSelected, duration, title } = body;
+    const url = await db.collection('commercials').doc(commercialId).get();
+    const amount = await getLocationsAmount(locationsSelected);
+    return({
+        amount: (amount.reduce((a, b) => a + b, 0)) * duration,
+        approvedAt: '',
+        commercialUrl:  url.data().url,
+        createdAt: new Date().toISOString(),
+        createdBy: userId,
+        duration,
+        locationsSelected: await getLocationsName(locationsSelected),
+        numberOfLocations: locationsSelected.length,
+        status: 'pending',
+        title,
+    });
+};
+/**
+    * returns a ticket created
+    * @function
+    * @param {String} title - ticket's title
+    * @param {String} priority - ticket's priority
+    * @param {String} userId - user's id
+    * @return  {Object} ticket's object
+    */
 const createCommercialResponseData = doc => {
     const { url, title, description, duration } = doc.data();
     return ({
@@ -104,6 +129,19 @@ const createTicketResponseData = (doc, userData) => {
         title,
     });
 };
+const getLocationNameData = async location => {
+    const amount = await db.collection('locations').doc(location);
+    const documentData = await amount.get();
+    const data = documentData.data().name;
+    return data;
+};
+const getLocationsName = async locations => {
+    const name = [];
+    locations.forEach(location => {
+        name.push(getLocationNameData(location));
+    });
+    return await Promise.all(name);
+};
 /**
     * returns a ticket created
     * @function
@@ -113,39 +151,39 @@ const createTicketResponseData = (doc, userData) => {
     * @return  {Object} ticket's object
     */
 // eslint-disable-next-line max-lines-per-function
-const camapignResponseData = async (doc, userData) => {
+const campaignResponseData = async (doc, userData) => {
     const { status, 
-        createdAt, createdBy, numberOfLocations, 
-        title, amount, locationsSelected, duration, commercialId } = doc.data();
-    console.log(commercialId);
-    const commercialDoc = await db.collection('commercials').doc(commercialId).get();
-    const getLocationdata = async location => {
-        const amount = await db.collection('locations').doc(location);
-        const documentData = await amount.get();
-        const data = documentData.data().name;
-        console.log(data);
-        return data;
-    };
-    const getLocationsName = async locations => {
-        const name = [];
-        locations.forEach(location => {
-            name.push(getLocationdata(location));
-        });
-        return await Promise.all(name);
-    };
-    const test = getLocationsName(locationsSelected);
-    console.log(test);
+        createdAt, createdBy, numberOfLocations, approvedAt,
+        title, amount, locationsSelected, duration, commercialUrl } = doc.data();
     const { firstName, lastName } = userData.docs[0].data();
     return ({
         amount,
+        approvedAt,
         campaignId: doc.id,
-        commerercialUrl: commercialDoc.data().url,
+        commercialUrl,
         createdAt,
         createdBy,
         customerName: `${firstName} ${lastName}`,
         duration,
         locationsSelected,
         numberOfLocations,
+        status,
+        title,
+    });
+};
+const singleCampaignResponseData = async doc => {
+    const { status, 
+        createdAt, createdBy, approvedAt,
+        title, amount, locationsSelected, duration, commercialUrl } = doc.data();
+    return ({
+        amount,
+        approvedAt,
+        campaignId: doc.id,
+        commercialUrl,
+        createdAt,
+        createdBy,
+        duration,
+        locationsSelected,
         status,
         title,
     });
@@ -237,7 +275,7 @@ const updateVideo = async (videoId, filePath, { description, title }) => {
         console.error(error);
     }
 };
-const getLocationdata = async location => {
+const getLocationData = async location => {
     const amount = await db.collection('locations').doc(location);
     const documentData = await amount.get();
     const data = documentData.data().price;
@@ -246,7 +284,7 @@ const getLocationdata = async location => {
 const getLocationsAmount = async locationarray => {
     const price = [];
     locationarray.forEach(location => {
-        price.push(getLocationdata(location));
+        price.push(getLocationData(location));
     });
     return await Promise.all(price);
 };
@@ -259,7 +297,8 @@ const getMultipleFirebaseLink = async (images, token) => {
     return await Promise.all(promises);
 }; 
 module.exports = {
-    camapignResponseData,
+    campaignResponseData,
+    createCampaignData,
     createCommercialResponseData,
     createMessageData,
     createTicketData,
@@ -267,7 +306,9 @@ module.exports = {
     createUserData,
     getFirebaseLink,
     getLocationsAmount,
+    getLocationsName,
     getMultipleFirebaseLink,
+    singleCampaignResponseData,
     superAdmin,
     updateVideo,
     uploadMultipleImages,
