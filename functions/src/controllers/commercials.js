@@ -45,15 +45,17 @@ class commercialController {
 	 */
     static async getAll(req, res) {
         try {
-            const { userId } = req.user;
-            const data = await db.collection('commercials').where('createdBy', '==', userId)
+            const { userId, isAdmin } = req.user; let data;
+            if (isAdmin) data = await db.collection('commercials')
+                .orderBy('createdAt', 'desc').get();
+            else data = await db.collection('commercials').where('createdBy', '==', userId)
                 .orderBy('createdAt', 'desc').get();
             const docs = data.docs;
-            const commercials = [];
-            for (const doc of docs) {
-                const newObj = Object.assign({}, doc.data(), { commercialId: doc.id });
-                commercials.push(newObj);
-            }
+            const commercialData = docs.map(async doc => {
+                const commercialResponseData = createCommercialResponseData(doc);
+                return commercialResponseData;
+            }); const commercials = await Promise.all(commercialData);
+            console.log(commercials);
             return successNoMessage(res, OK, commercials);
         } catch (error) {
             return tryCatchError(res, error);
