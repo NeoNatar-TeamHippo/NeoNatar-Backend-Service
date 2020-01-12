@@ -9,6 +9,6 @@ router.post('/', FBauth, filesUpload, commercialController.create);
 router.get('/', FBauth, commercialController.getAll);
 router.get('/:id', FBauth, commercialController.getOne);
 router.put('/:id', FBauth, filesUpload, commercialController.update);
-router.delete('/:id', FBauth, commercialController.update);
+router.delete('/:id', FBauth, commercialController.delete);
 
 module.exports = router;
