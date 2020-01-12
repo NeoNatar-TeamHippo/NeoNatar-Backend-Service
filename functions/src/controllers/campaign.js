@@ -9,7 +9,8 @@ const { input } = require('../config/constant');
 const { pending, live } = input;
 const { tryCatchError, validationError } = require('../utils/errorHandler');
 const { successNoData, successNoMessage } = require('../utils/successHandler');
-const { camapignResponseData } = require('../utils/functions');
+const { campaignResponseData,
+    createCampaignData, singleCampaignResponseData } = require('../utils/functions');
 
 const Campaign = {
     /**
@@ -19,49 +20,14 @@ const Campaign = {
 	 * @param {object} res - response object
 	 * @return  {Object} result
     */
-
-    async adminGetAll(req, res) {
-        try {
-            const campaigns = [];
-            const data = await db.collection('campaigns').get();
-            const docs = data.docs;
-            for (const doc of docs) {
-                const selectedItem = {
-                    campaign: doc.data(),
-                    id: doc.id,
-                };
-                campaigns.push(selectedItem);
-            }
-            return successNoMessage(res, OK, campaigns);
-        } catch (error) {
-            tryCatchError(res, error);
-        }
-    },
-
-    async adminGetOne(req, res) {
-        try {
-            const document = db.collection('campaigns').doc(req.params.id);
-            if (!document) {
-                return validationError(res, 'Document not found');
-            }
-            const documentData = await document.get();
-            const campaign = documentData.data();
-            return successNoMessage(res, OK, campaign);
-        } catch (error) {
-            tryCatchError(res, error);
-        }
-    },
-
     async campaignApproved(req, res) {
         try {
             const document = db.collection('campaigns').doc(req.params.id);
             if (!document) validationError(res, errors);
             req.body.status = live;
             req.body.approvedAt = new Date().toISOString();
-            if (valid) {
-                await document.update(req.body);
-                return successNoData(res, CREATED, 'campaign successfully updated');
-            }
+            await document.update(req.body);
+            return successNoData(res, CREATED, 'campaign successfully updated');
         } catch (error) {
             tryCatchError(res, error);
         }
@@ -69,17 +35,12 @@ const Campaign = {
 
     async create(req, res) {
         try {
+            const { userId } = req.user;
             const { valid, errors } = await validateCampaignInput(req.body);
             if (!valid) validationError(res, errors);
-            req.body.createdAt = new Date().toISOString();
-            req.body.createdBy = req.user.userId;
-            req.body.status = pending;
-            req.body.numberOfLocations = req.body.locationsSelected.length;
-            let amount = await getLocationsAmount(req.body.locationsSelected);
-            amount = amount.reduce((a, b) => a + b, 0);
-            req.body.amount = amount * req.body.duration;
+            const campaignData = await createCampaignData(req.body, userId);
             if (valid) {
-                await db.collection('campaigns').doc().create(req.body);
+                await db.collection('campaigns').doc().create(campaignData);
                 return successNoData(res, CREATED, 'Campaign successfully created');
             }
         } catch (error) {
@@ -111,7 +72,7 @@ const Campaign = {
             const retrievedUsers = docs.map(async doc => {
                 const userData = await db.collection('users')
                     .where('userId', '==', doc.data().createdBy).get();
-                const responseData = camapignResponseData(doc, userData);
+                const responseData = campaignResponseData(doc, userData);
                 return responseData;
             });
             const campaignsAndUsers = await Promise.all(retrievedUsers);
@@ -128,11 +89,11 @@ const Campaign = {
                 return validationError(res, 'Document not found');
             }
             const documentData = await document.get();
-            const campaign = documentData.data();
-            if (campaign.createdBy !== req.user.uid) {
-                return validationError(res, 'Not Authorized');
-            }
-            return successNoMessage(res, OK, campaign);
+            const complainantId = documentData.data().createdBy;
+            const data = await db.collection('users')
+                .where('userId', '==', complainantId).get();
+            const responseData = await singleCampaignResponseData(documentData);
+            return successNoMessage(res, OK, responseData);
         } catch (error) {
             tryCatchError(res, error);
         }
