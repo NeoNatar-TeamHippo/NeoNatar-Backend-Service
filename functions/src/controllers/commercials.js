@@ -25,12 +25,13 @@ class commercialController {
             const duration = await getVideoDurationInSeconds(filePath);
             const { url, id } = await uploads(filePath);
             const newCommercial = {
-                createdAt: new Date().toISOString(),
-                createdBy: userId, description, duration: Math.round(duration), title,
-                url, videoId: id,
+                createdAt: new Date().toISOString(), createdBy: userId, description,
+                duration: Math.round(duration), title, url, videoId: id,
             };
             const doc = await db.collection('commercials').add(newCommercial);
-            return successNoData(res, CREATED, `Commercial with id ${doc.id} was created`);
+            const dataDoc = await db.collection('commercials').doc(doc.id).get();
+            const data = dataDoc.data();
+            return successWithData(res, CREATED, 'created successfully', data);
         } catch (error) {
             return tryCatchError(res, error);
         }
