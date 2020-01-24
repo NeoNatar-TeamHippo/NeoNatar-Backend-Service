@@ -1,7 +1,14 @@
+const { functions } = require('./firebase');
 const cloudinary = require('cloudinary');
 const { cloudinaryConfig } = require('../config/index');
 const { cloud_name, api_key, api_secret } = cloudinaryConfig;
 
+// const { apikey, apisecret, cloudname } = functions.config().cloudinary;
+// cloudinary.config({
+//     api_key: apikey,
+//     api_secret: apisecret,
+//     cloud_name: cloudname,
+// });
 cloudinary.config({
     api_key,
     api_secret,
