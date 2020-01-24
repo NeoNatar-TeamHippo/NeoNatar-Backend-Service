@@ -174,7 +174,7 @@ const campaignResponseData = async (doc, userData) => {
 const singleCampaignResponseData = async doc => {
     const { status,
         createdAt, createdBy, approvedAt,
-        title, amount, locationsSelected, duration, commercialUrl } = doc.data();
+        title, amount, locationsSelected, duration, commercialUrl, message } = doc.data();
     return ({
         amount,
         approvedAt,
@@ -184,6 +184,7 @@ const singleCampaignResponseData = async doc => {
         createdBy,
         duration,
         locationsSelected,
+        message,
         status,
         title,
     });

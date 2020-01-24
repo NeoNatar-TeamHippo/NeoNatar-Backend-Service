@@ -6,7 +6,7 @@ const { db } = require('../utils/firebase');
 const validateCampaignInput = require('../validations/campaignInput');
 const { getLocationsAmount } = require('../utils/functions');
 const { input } = require('../config/constant');
-const { pending, live } = input;
+const { live, disapproved } = input;
 const { tryCatchError, validationError } = require('../utils/errorHandler');
 const { successNoData, successNoMessage } = require('../utils/successHandler');
 const { campaignResponseData,
@@ -28,6 +28,19 @@ const Campaign = {
             req.body.approvedAt = new Date().toISOString();
             await document.update(req.body);
             return successNoData(res, CREATED, 'campaign successfully updated');
+        } catch (error) {
+            tryCatchError(res, error);
+        }
+    },
+
+    async campaignDisapproved(req, res) {
+        try {
+            const document = db.collection('campaigns').doc(req.params.id);
+            if (!document) validationError(res, errors);
+            req.body.status = disapproved;
+            req.body.disapprovedAt = new Date().toISOString();
+            await document.update(req.body);
+            return successNoData(res, CREATED, 'campaign disapproved');
         } catch (error) {
             tryCatchError(res, error);
         }
