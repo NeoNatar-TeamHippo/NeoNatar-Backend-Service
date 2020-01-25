@@ -51,11 +51,12 @@ const Campaign = {
             const { userId } = req.user;
             const { valid, errors } = await validateCampaignInput(req.body);
             if (!valid) validationError(res, errors);
-            const campaignData = await createCampaignData(req.body, userId);
-            if (valid) {
+            else {
+                const campaignData = await createCampaignData(req.body, userId);
                 await db.collection('campaigns').doc().create(campaignData);
                 return successNoData(res, CREATED, 'Campaign successfully created');
             }
+
         } catch (error) {
             return tryCatchError(res, error);
         }

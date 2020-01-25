@@ -18,6 +18,7 @@ class commercialController {
 	 * @return  {Object} result
 	 */
     // TODO: check for mimetype if video b4 proceeding to uploading to cloudinary
+    // eslint-disable-next-line max-lines-per-function
     static async create(req, res) {
         try {
             const { title, description } = req.body;
@@ -28,12 +29,13 @@ class commercialController {
             const duration = await getVideoDurationInSeconds(filePath);
             const { url, id } = await uploads(filePath);
             const newCommercial = {
-                createdAt: new Date().toISOString(),
-                createdBy: userId, description, duration: Math.round(duration), title,
-                url, videoId: id,
+                createdAt: new Date().toISOString(), createdBy: userId, description,
+                duration: Math.round(duration), title, url, videoId: id,
             };
             const doc = await db.collection('commercials').add(newCommercial);
-            return successNoData(res, CREATED, `Commercial with id ${doc.id} was created`);
+            const dataDoc = await db.collection('commercials').doc(doc.id).get();
+            const data = dataDoc.data();
+            return successWithData(res, CREATED, 'created successfully', data);
         } catch (error) {
             return tryCatchError(res, error);
         }
@@ -54,10 +56,9 @@ class commercialController {
                 .orderBy('createdAt', 'desc').get();
             const docs = data.docs;
             const commercialData = docs.map(async doc => {
-                const commercialResponseData = createCommercialResponseData(doc);
+                const commercialResponseData = Object.assign({}, doc.data(), { id: doc.id });
                 return commercialResponseData;
             }); const commercials = await Promise.all(commercialData);
-            console.log(commercials);
             return successNoMessage(res, OK, commercials);
         } catch (error) {
             return tryCatchError(res, error);

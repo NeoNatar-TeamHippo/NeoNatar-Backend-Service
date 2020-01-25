@@ -46,7 +46,7 @@ const createUserData = (avatar, email, firstName, lastName, userId, isAdmin) => 
     */
 const createTicketData = (title, priority, userId, userData) => {
     const { avatar, firstName, lastName } = userData.docs[0].data();
-    return({
+    return ({
         avatar,
         createdAt: new Date().toISOString(),
         createdBy: userId,
@@ -76,10 +76,10 @@ const createCampaignData = async (body, userId) => {
     const { commercialId, locationsSelected, duration, title } = body;
     const url = await db.collection('commercials').doc(commercialId).get();
     const amount = await getLocationsAmount(locationsSelected);
-    return({
+    return ({
         amount: (amount.reduce((a, b) => a + b, 0)) * duration,
         approvedAt: '',
-        commercialUrl:  url.data().url,
+        commercialUrl: url.data().url,
         createdAt: new Date().toISOString(),
         createdBy: userId,
         duration,
@@ -152,7 +152,7 @@ const getLocationsName = async locations => {
     */
 // eslint-disable-next-line max-lines-per-function
 const campaignResponseData = async (doc, userData) => {
-    const { status, 
+    const { status,
         createdAt, createdBy, numberOfLocations, approvedAt,
         title, amount, locationsSelected, duration, commercialUrl } = doc.data();
     const { firstName, lastName } = userData.docs[0].data();
@@ -172,7 +172,7 @@ const campaignResponseData = async (doc, userData) => {
     });
 };
 const singleCampaignResponseData = async doc => {
-    const { status, 
+    const { status,
         createdAt, createdBy, approvedAt,
         title, amount, locationsSelected, duration, commercialUrl, message } = doc.data();
     return ({
@@ -198,8 +198,8 @@ const singleCampaignResponseData = async doc => {
     * @return  {Object} ticket's object
     */
 const transactionResponseData = doc => {
-    const { status, 
-        createdAt, createdBy, amount, 
+    const { status,
+        createdAt, createdBy, amount,
         title, campaignId } = doc.data();
     return ({
         amount,
@@ -220,7 +220,7 @@ const transactionResponseData = doc => {
     * @return  {Object} message's object
     */
 const createMessageData = (body, isAdmin, userData) => {
-    if(isAdmin) {
+    if (isAdmin) {
         return ({
             author: 'Neonatar Admin',
             avatar: adminImage,
@@ -229,13 +229,13 @@ const createMessageData = (body, isAdmin, userData) => {
             isAdmin,
         });
     }
-    if(!isAdmin) {
+    if (!isAdmin) {
         const { avatar, firstName, lastName } = userData.docs[0].data();
         return ({
             author: `${firstName} ${lastName}`,
             avatar,
             content: body,
-            createdAt: new Date().toISOString(),isAdmin,
+            createdAt: new Date().toISOString(), isAdmin,
         });
     }
 };
@@ -318,7 +318,7 @@ const uploadMultipleImages = async (images, token) => {
 const getMultipleFirebaseLink = async (images, token) => {
     const promises = images.map(image => getFirebaseLink(image.originalname, token));
     return await Promise.all(promises);
-}; 
+};
 module.exports = {
     campaignResponseData,
     createCampaignData,
