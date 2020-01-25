@@ -6,7 +6,7 @@ const morgan = require('morgan');
 const routes = require('./src/routes');
 const { functions, db } = require('./src/utils/firebase');
 const { sendText } = require('./src/utils/emailService');
-const { createTransactionData } = require('./src/utils/functions');
+const { transactionResponseData } = require('./src/utils/functions');
 
 const app = express();
 
@@ -107,7 +107,7 @@ exports.newTransactionNotification = functions.region('europe-west1')
             const { id: campaignId } = snapshot;
             const { createdBy } = snapshot.data();
             const dataToAdd = {
-                campaignId: id, createdAt: new Date().toISOString(),
+                campaignId, createdAt: new Date().toISOString(),
                 message: 'New Campaign Created', read: false, type: 'campaign', userId: createdBy,
             };
             await db.collection('notifications').add(dataToAdd);
@@ -116,7 +116,7 @@ exports.newTransactionNotification = functions.region('europe-west1')
             const userId = campaignData.createdBy;
             const data = await db.collection('users').where('userId', '==', userId).get();
             const user = data.docs[0].data();
-            const transactionData = createTransactionData(campaignData, user, campaignId);
+            const transactionData = Object.assign({}, campaignData, user, { campaignId });
             return await db.collection('transactions').add(transactionData);
         } catch (error) {
             console.log(error);
