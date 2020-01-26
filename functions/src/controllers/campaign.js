@@ -48,11 +48,16 @@ const Campaign = {
 
     async create(req, res) {
         try {
-            const { userId } = req.user;
+            const { userId, isAdmin } = req.user;
+            let userData;
+            if (!isAdmin) {
+                userData = await db.collection('users')
+                    .where('userId', '==', userId).get();
+            }
             const { valid, errors } = await validateCampaignInput(req.body);
             if (!valid) validationError(res, errors);
             else {
-                const campaignData = await createCampaignData(req.body, userId);
+                const campaignData = await createCampaignData(req.body, userId, userData);
                 await db.collection('campaigns').doc().create(campaignData);
                 return successNoData(res, CREATED, 'Campaign successfully created');
             }
