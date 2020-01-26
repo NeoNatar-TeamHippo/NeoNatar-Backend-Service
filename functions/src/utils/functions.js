@@ -72,8 +72,9 @@ const createTicketData = (title, priority, userId, userData) => {
     * @param {String} userId - user's id
     * @return  {Object} ticket's object
     */
-const createCampaignData = async (body, userId) => {
+const createCampaignData = async (body, userId, userData) => {
     const { commercialId, locationsSelected, duration, title } = body;
+    const { firstName, lastName } = userData.docs[0].data();
     const url = await db.collection('commercials').doc(commercialId).get();
     const amount = await getLocationsAmount(locationsSelected);
     return ({
@@ -82,6 +83,7 @@ const createCampaignData = async (body, userId) => {
         commercialUrl: url.data().url,
         createdAt: new Date().toISOString(),
         createdBy: userId,
+        customerName: `${firstName} ${lastName}`,
         duration,
         locationsSelected: await getLocationsName(locationsSelected),
         numberOfLocations: locationsSelected.length,

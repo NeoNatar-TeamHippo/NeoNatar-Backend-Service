@@ -1,4 +1,4 @@
-const { functions } = require('./firebase');
+const functions = require('firebase-functions');
 const cloudinary = require('cloudinary');
 const { cloudinaryConfig } = require('../config/index');
 const { cloud_name, api_key, api_secret } = cloudinaryConfig;
