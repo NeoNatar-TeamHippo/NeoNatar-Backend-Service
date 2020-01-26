@@ -1,19 +1,19 @@
-const { functions } = require('./firebase');
+const functions = require('firebase-functions');
 const cloudinary = require('cloudinary');
 const { cloudinaryConfig } = require('../config/index');
 const { cloud_name, api_key, api_secret } = cloudinaryConfig;
 
-// const { apikey, apisecret, cloudname } = functions.config().cloudinary;
-// cloudinary.config({
-//     api_key: apikey,
-//     api_secret: apisecret,
-//     cloud_name: cloudname,
-// });
+const { apikey, apisecret, cloudname } = functions.config().cloudinary;
 cloudinary.config({
-    api_key,
-    api_secret,
-    cloud_name,
+    api_key : apikey,
+    api_secret: apisecret,
+    cloud_name: cloudname,
 });
+// cloudinary.config({
+//     api_key,
+//     api_secret,
+//     cloud_name,
+// });
 const uploads = file => new Promise(resolve => {
     cloudinary.uploader.upload(
         file,
