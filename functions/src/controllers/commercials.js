@@ -34,8 +34,8 @@ class commercialController {
             };
             const doc = await db.collection('commercials').add(newCommercial);
             const dataDoc = await db.collection('commercials').doc(doc.id).get();
-            const data = dataDoc.data();
-            return successWithData(res, CREATED, 'created successfully', data);
+            return successWithData(res, CREATED, 'created successfully', Object.assign({},
+                { id: doc.id }, dataDoc.data()));
         } catch (error) {
             return tryCatchError(res, error);
         }

@@ -200,12 +200,13 @@ const singleCampaignResponseData = async doc => {
 const transactionResponseData = doc => {
     const { status,
         createdAt, createdBy, amount,
-        title, campaignId } = doc.data();
+        title, campaignId, firstName, lastName } = doc.data();
+    const fullName = `${firstName} ${lastName}`;
     return ({
         amount,
         campaignId,
-        createdAt,
-        createdBy,
+        createdAt: (new Date(createdAt)).toDateString(),
+        createdBy: fullName,
         status,
         title,
         transactionId: doc.id,
